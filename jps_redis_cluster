@@ -1,0 +1,16 @@
+_info : 'https://docs.cloudscripting.com/1.6.2/'
+version: 1.6.2
+build: 20200122
+type: update
+name: 'Redis_cluster'
+id: 'Redis_cluster'
+#homepage: https://jps.layershift.com/Redis_cluster
+baseUrl: https://raw.githubusercontent.com/layershift/jps-logDNA/master/logDNA.jps
+logo: /images/logDNA.png?_r=${fn.random}
+
+categories:
+ - apps/others
+
+description:
+  text: /texts/description.md
+  short: LogDNA is the easiest centralized log management software.
