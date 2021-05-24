@@ -13,4 +13,4 @@ categories:
 
 description:
   text: /texts/description.md
-  short: LogDNA is the easiest centralized log management software.
+  short: Easy way to deploy Redis Cluster configuration
