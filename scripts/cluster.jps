@@ -2,4 +2,6 @@ type: update
 name: Return Action
 
 onInstall:
-  return: Hello World!
+  return:
+    type: success
+    message: Compute node unique identifier - ${nodes.cp.id}
