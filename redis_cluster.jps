@@ -48,6 +48,6 @@ nodes:
   actions:
 
     install-cluster:
-    - install: 
+    - install: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
       nodeGroup: master_redis
       skipEmail: true
