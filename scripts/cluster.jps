@@ -2,6 +2,7 @@ type: update
 name: Return Action
 
 onInstall:
-  return:
-    type: success
-    message: Compute node unique identifier - ${nodes.cp.id}
+  - install: https://raw.githubusercontent.com/layershift/control_panel_load/main/restart.jps
+      nodeGroup: master_redis
+      skipEmail: true
+      
