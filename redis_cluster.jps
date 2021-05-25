@@ -1,11 +1,11 @@
 _info : 'https://docs.cloudscripting.com/1.6.2/'
 version: 1.6.2
 build: 20200122
-type: update
+type: install
 name: 'Redis_cluster'
 id: 'Redis_cluster'
-#homepage: https://jps.layershift.com/Redis_cluster
-baseUrl: https://raw.githubusercontent.com/layershift/jps-logDNA/master/logDNA.jps
+homepage: https://github.com/layershift/jps_redis_cluster
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
 logo: /images/logDNA.png?_r=${fn.random}
 
 categories:
@@ -14,3 +14,40 @@ categories:
 description:
   text: /texts/description.md
   short: Easy way to deploy Redis Cluster configuration
+
+settings:
+  fields:
+  - caption: Number of Master servers
+    type: spinner
+    name: master
+    increment: 1
+    default: 1
+    min: 1
+  - caption: Cloudlets
+    type: spinner
+    name: cldts
+    increment: 2
+    default: 10
+    min: 4
+
+nodes:
+  - nodeType: redis
+    displayName: Master Nodes
+    flexibleCloudlets: ${settings.cldts}
+    count: ${settings.master}
+    nodeGroup: master_redis
+    skipNodeEmails: true
+  
+  - nodeType: redis
+    displayName: Slave Nodes
+    flexibleCloudlets: ${settings.cldts}
+    count: ${settings.master}
+    nodeGroup: slave_redis
+    skipNodeEmails: true
+  
+  actions:
+
+    install-cluster:
+    - install: 
+      nodeGroup: master_redis
+      skipEmail: true
