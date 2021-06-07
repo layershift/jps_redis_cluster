@@ -1,8 +1,0 @@
-type: update
-name: Return Action
-
-onInstall:
-  - install: https://raw.githubusercontent.com/layershift/control_panel_load/main/restart.jps
-    nodeGroup: master_redis
-    skipEmail: true
-      
