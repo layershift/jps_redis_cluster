@@ -127,4 +127,3 @@ actions:
     nodeId: ${nodes.master_redis[0].id}
     cmd : 
      echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt`
-  
