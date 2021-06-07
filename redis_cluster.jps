@@ -30,24 +30,42 @@ settings:
     default: 10
     min: 4
 
-nodes:
-  - nodeType: redis
-    displayName: Master Nodes
-    flexibleCloudlets: ${settings.cldts}
-    count: ${settings.master}
-    nodeGroup: master_redis
-    skipNodeEmails: true
-  
-  - nodeType: redis
-    displayName: Slave Nodes
-    flexibleCloudlets: ${settings.cldts}
-    count: ${settings.master}
-    nodeGroup: slave_redis
-    skipNodeEmails: true
-  
-  actions:
+onInstall :
+- set-firewall:
+- set-firewall-cluster :
 
-    install-cluster:
-    - install: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
-      nodeGroup: master_redis
-      skipEmail: true
+nodes:
+- nodeType: redis
+  displayName: Master Nodes
+  flexibleCloudlets: ${settings.cldts}
+  count: ${settings.master}
+  nodeGroup: master_redis
+  skipNodeEmails: true
+- nodeType: redis
+  displayName: Slave Nodes
+  flexibleCloudlets: ${settings.cldts}
+  count: ${settings.master}
+  nodeGroup: slave_redis
+  skipNodeEmails: true
+
+actions :
+  set-firewall :
+      api[master_redis, slave_redis]:
+        - method: environment.security.addrule
+          params:
+            rule: {
+              action: "ALLOW",
+              direction: "INPUT",
+              name: "Redis server",
+              ports: "7000-7005"
+              }
+  set-firewall-cluster :
+      api[master_redis, slave_redis]:
+        - method: environment.security.addrule
+          params:
+            rule: {
+              action: "ALLOW",
+              direction: "INPUT",
+              name: "Redis Cluste",
+              ports: "17000-17005"
+              }

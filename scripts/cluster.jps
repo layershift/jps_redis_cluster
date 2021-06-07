@@ -1,5 +1,130 @@
 type: update
-name: Return Action
+name: 'ACTION TESTING'
 
 onInstall:
-  return: Hello World!
+  - createFile [master_redis, slave_redis]: /etc/redis/ips.txt
+  - createFile [master_redis, slave_redis] : /etc/redis/iulian.conf
+  - set_port :
+  - set_port1 :
+  - set_port2 :
+  - set_port3 :
+  - set_port4 :
+  - set_port5 :
+  - greeting2 :
+  - greeting3 :
+  - greeting4 :
+  - greeting5 :
+  - greeting6 :
+  - log_master:
+      message: ${nodes.master_redis[0].address}:${settings.fm} ${nodes.master_redis[1].address}:${settings.sm} ${nodes.master_redis[2].address}:${settings.tm} ${nodes.slave_redis[0].address}:${settings.fs} ${nodes.slave_redis[1].address}:${settings.ss} ${nodes.slave_redis[2].address}:${settings.ts}
+  - log_master:
+      message: --cluster-replicas 1
+
+  - start_redis_server :
+  - start_redis_cluster:
+settings:
+  fields:
+  - caption: First master Port Number
+    type: spinner
+    name: fm
+    increment: 1
+    default: 7000
+    min: 1
+  - caption: second master Port Number
+    type: spinner
+    name: sm
+    increment: 1
+    default: 7001
+    min: 1
+  - caption: third master Port Number
+    type: spinner
+    name: tm
+    increment: 1
+    default: 7002
+    min: 1
+  - caption: First slave Port Number
+    type: spinner
+    name: fs
+    increment: 1
+    default: 7003
+    min: 1
+  - caption: second slave Port Number
+    type: spinner
+    name: ss
+    increment: 1
+    default: 7004
+    min: 1
+  - caption: third slave Port Number
+    type: spinner
+    name: ts
+    increment: 1
+    default: 7005
+    min: 1  
+    
+actions:
+  set_port :
+    - nodeId: ${nodes.master_redis[0].id}
+      appendFile [master_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.fm}
+  set_port1 :
+    - nodeId: ${nodes.master_redis[1].id}
+      appendFile [master_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.sm}
+  set_port2 :
+    - nodeId: ${nodes.master_redis[2].id}
+      appendFile [master_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.tm}
+  set_port3 :
+    - nodeId: ${nodes.slave_redis[0].id}
+      appendFile [slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.fs}
+  set_port4 :
+    - nodeId: ${nodes.slave_redis[1].id}
+      appendFile [slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.ss}
+  set_port5 :
+    - nodeId: ${nodes.slave_redis[2].id}
+      appendFile [slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: port ${settings.ts}
+  greeting2:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: cluster-enabled yes
+  greeting3:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: cluster-config-file nodes.conf
+  greeting4:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: cluster-node-timeout 5000
+  greeting5:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: protected-mode no
+  greeting6:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/iulian.conf
+      body: appendonly yes  
+  log_master:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/ips.txt
+      body: ${this.message}
+  log_slave:
+    appendFile [master_redis, slave_redis]:
+      path: /etc/redis/ips.txt
+      body: ${this.message}
+  start_redis_server:
+    cmd [master_redis, slave_redis] :
+      screen -dm /usr/bin/redis-server /etc/redis/iulian.conf
+  start_redis_cluster:
+    nodeId: ${nodes.master_redis[0].id}
+    cmd : 
+     echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt`
+  
