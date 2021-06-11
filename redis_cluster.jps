@@ -33,7 +33,8 @@ settings:
 onInstall :
 - set-firewall:
 - set-firewall-cluster :
-
+- install:
+      jps: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
 nodes:
 - nodeType: redis
   displayName: Master Nodes
@@ -57,6 +58,7 @@ actions :
               action: "ALLOW",
               direction: "INPUT",
               name: "Redis server",
+              src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
               ports: "7000-7005"
               }
   set-firewall-cluster :
@@ -66,6 +68,7 @@ actions :
             rule: {
               action: "ALLOW",
               direction: "INPUT",
-              name: "Redis Cluste",
+              name: "Redis Cluster",
+              src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
               ports: "17000-17005"
               }
