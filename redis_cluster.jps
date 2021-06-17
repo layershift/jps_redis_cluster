@@ -6,7 +6,7 @@ name: 'Redis_cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
-logo: /images/redis.jpg
+logo: /images/Redis_cluster.png?_r=${fn.random}
 
 categories:
  - apps/others
