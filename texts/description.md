@@ -15,3 +15,15 @@ For more information on what Jelastic add-on is and how to apply it, follow the 
 
 **Instalation**
 
+On the first screen of the instalation you will find the option to select the number of cloudlets you want to assign to the nodes (at least 10 is recommended), the Environment name and display name, and the Region where you want to deploy.
+![Install](https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/images/deploy.PNG)
+
+The cluster will be deployed with 3 Master nodes and 3 Slave nodes. The nodes will be deployed on different hardware Servers in sets of three, as follows:
+Master node1: Hardware node A
+Master node2: Hardware node B
+Master node3: Hardware node C
+Slave node1: Hardware node A
+Slave node2: Hardware node B
+Slave node3: Hardware node C
+
+

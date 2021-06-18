@@ -5,14 +5,13 @@ type: install
 name: 'Redis_cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
-baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
-logo: /images/redis.jpg
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
+logo: /images/Redis_cluster.png?_r=${fn.random}
 
 categories:
  - apps/others
 
 description:
-  text: /texts/description.md
   short: Easy way to deploy Redis Cluster configuration
 
 settings:
@@ -42,13 +41,11 @@ nodes:
   flexibleCloudlets: ${settings.cldts}
   count: ${settings.master}
   nodeGroup: master_redis
-  skipNodeEmails: true
 - nodeType: redis
   displayName: Slave Nodes
   flexibleCloudlets: ${settings.cldts}
   count: ${settings.master}
   nodeGroup: slave_redis
-  skipNodeEmails: true
 
 actions :
   set-firewall :
