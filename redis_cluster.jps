@@ -5,11 +5,7 @@ type: install
 name: 'Redis_cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
-<<<<<<< HEAD
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
-=======
-baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
->>>>>>> 433361d5516898758fdb7762e58e542fcec5231a
 logo: /images/Redis_cluster.png?_r=${fn.random}
 
 categories:
