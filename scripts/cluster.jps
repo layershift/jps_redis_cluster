@@ -7,17 +7,24 @@ id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
 logo: /images/redis.jpg
-targetNodes:
-  targetNodes: 
+targetNodes: 
   nodeGroup: 'master_redis, slave_redis'
+
+globals:
+  pass: ${fn.password}
+
 menu :
 - confirmText: check redis status
   caption: check redis status
   action: status
+- confirmText: List nodes
+  caption : List Cluster Nodes
+  action: list_nodes
 
 onInstall:
   - createFile [master_redis]: /etc/redis/ips.txt
-  - createFile [master_redis, slave_redis] : /etc/redis/iulian.conf
+  - createFile [master_redis, slave_redis] : /etc/redis/redis_cluster.conf
+  - set_password :
   - set_port :
   - set_port1 :
   - set_port2 :
@@ -89,52 +96,52 @@ actions:
   set_port :
     - nodeId: ${nodes.master_redis[0].id}
       appendFile [master_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.fm}
   set_port1 :
     - nodeId: ${nodes.master_redis[1].id}
       appendFile [master_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.sm}
   set_port2 :
     - nodeId: ${nodes.master_redis[2].id}
       appendFile [master_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.tm}
   set_port3 :
     - nodeId: ${nodes.slave_redis[0].id}
       appendFile [slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.fs}
   set_port4 :
     - nodeId: ${nodes.slave_redis[1].id}
       appendFile [slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.ss}
   set_port5 :
     - nodeId: ${nodes.slave_redis[2].id}
       appendFile [slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: port ${settings.ts}
   config2:
     appendFile [master_redis, slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: cluster-enabled yes
   config3:
     appendFile [master_redis, slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: cluster-config-file nodes.conf
   config4:
     appendFile [master_redis, slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: cluster-node-timeout 5000
   config5:
     appendFile [master_redis, slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: protected-mode no
   config6:
     appendFile [master_redis, slave_redis]:
-      path: /etc/redis/iulian.conf
+      path: /etc/redis/redis_cluster.conf
       body: appendonly yes  
   config_cluster:
     appendFile [master_redis]:
@@ -142,14 +149,32 @@ actions:
       body: ${this.message}
   start_redis_server:
     cmd [master_redis, slave_redis] :
-      screen -dm /usr/bin/redis-server /etc/redis/iulian.conf
+      screen -dm /usr/bin/redis-server /etc/redis/redis_cluster.conf
   start_redis_cluster:
     nodeId: ${nodes.master_redis[0].id}
     cmd : 
-      echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt`
+      /bin/echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt`
+  set_password:
+    cmd [master_redis, slave_redis] :
+      - /bin/sed -i 's/requirepass/#requirepass/g' /etc/redis.conf
+      - /bin/echo "requirepass ${globals.pass}" >> /etc/redis.conf
+      - sleep 5
+      - /bin/systemctl restart redis
+    user: root
+  list_nodes:
+  - setGlobals:
+     - message: ""
+    nodeId: ${nodes.master_redis[0].id}
+    cmd :
+      - redis-cli -p 7000 cluster nodes
+      - appendMessage: ${response.out}
+      - message: ${globals.message}
+        script: |
+          return {result: 2308, message: message.replace(/\n/g, '  \n')}
+
   uninstall:
     cmd [master_redis, slave_redis] :
-      rm -f /etc/redis/ips.txt
-      rm -f /etc/redis/iulian.conf
-      rm -f /var/lib/redis/nodes.conf
+      - rm -f /etc/redis/ips.txt
+      - rm -f /etc/redis/redis_cluster.conf
+      - rm -f /var/lib/redis/nodes.conf
     user: root
