@@ -7,7 +7,8 @@ id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
 logo: /images/Redis_cluster.png?_r=${fn.random}
-
+targetNodes: 
+  nodeGroup: 'cp'
 categories:
  - apps/others
 
@@ -22,19 +23,28 @@ settings:
     increment: 1
     default: 3
     min: 1
-    hidden: true
+    hidden: false
   - caption: Cloudlets
     type: spinner
     name: cldts
     increment: 2
     default: 10
     min: 4
-
+  - caption: New Environment
+    type: checkbox
+    name: new_environment  
+    value: true
+    hideLabel: false
+    hidden: false
 onInstall :
 - set-firewall:
 - set-firewall-cluster :
 - install:
       jps: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
+
+if ( ${settings.new_environment} == false ):
+- config_cluster:
+
 nodes:
 - nodeType: redis
   displayName: Master Nodes
@@ -70,3 +80,7 @@ actions :
               src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
               ports: "17000-17005"
               }
+ - config_cluster:
+      message: this is a quit message
+
+ 

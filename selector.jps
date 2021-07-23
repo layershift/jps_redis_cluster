@@ -1,0 +1,106 @@
+type: install
+name: Example
+
+settings:
+  fields:  
+    - type: radiolist
+      caption: Installation Mode
+      name: mode
+      default: newEnv
+      columns: 2
+      values:
+        - caption: New Environment
+          value: newEnv        
+
+        - caption: Existing Environment
+          value: existingEnv        
+      showIf:
+        newEnv:
+          - caption: Environment
+            type: envname
+            name: envName
+            dependsOn: region
+          - caption: Region
+            type: regionlist
+            name: region
+            disableInactive: true
+            selectFirstAvailable: true 
+          - caption: Number of Master servers
+            type: spinner
+            name: master
+            increment: 1
+            default: 3
+            min: 1
+            hidden: false
+          - caption: Cloudlets
+            type: spinner
+            name: cldts
+            increment: 2
+            default: 10
+            min: 4
+        existingEnv:
+          - caption: Environment
+            type: envlist
+            name: envName
+            valueField: shortdomain        
+
+onInstall:
+  # create appropriate environment
+  - if (settings.mode == 'newEnv'):
+      install: 
+        envName: ${settings.envName}
+        region: ${settings.region}
+        jps: 
+         type: install
+         name: Create Env      
+         nodes:
+          - nodeType: redis
+            displayName: Master Nodes
+            flexibleCloudlets: ${settings.cldts}
+            count: ${settings.master}
+            nodeGroup: master_redis
+          - nodeType: redis
+            displayName: Slave Nodes
+            flexibleCloudlets: ${settings.cldts}
+            count: ${settings.master}
+            nodeGroup: slave_redis
+            onInstall :
+          - set-firewall:
+          - set-firewall-cluster :
+          - install:
+                jps: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
+        actions :
+          set-firewall :
+              api[master_redis, slave_redis]:
+                - method: environment.security.addrule
+                  params:
+                    rule: {
+                      action: "ALLOW",
+                      direction: "INPUT",
+                      name: "Redis server",
+                      src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
+                      ports: "7000-7005"
+                      }
+          set-firewall-cluster :
+              api[master_redis, slave_redis]:
+                - method: environment.security.addrule
+                  params:
+                    rule: {
+                      action: "ALLOW",
+                      direction: "INPUT",
+                      name: "Redis Cluster",
+                      src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
+                      ports: "17000-17005"
+                      }  
+  # install common add-on
+  - install:
+      envName: ${settings.envName}
+      jps:
+        type: update
+        name: Update Env    
+        onInstall:
+          - log: do some stuff
+
+
+
+##env-0034126
