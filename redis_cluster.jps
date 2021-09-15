@@ -52,6 +52,10 @@ settings:
             increment: 2
             default: 10
             min: 4
+          - caption: Public IP
+            type: checkbox
+            name: public_ip
+            default: false
       #Settings for selecting current Environment
         existingEnv:
           - caption: Environment
@@ -74,11 +78,15 @@ onInstall:
               flexibleCloudlets: ${settings.cldts}
               count: ${settings.master}
               nodeGroup: master_redis
+              if ( ${settings.public_ip} == true ):
+              extip: true
             - nodeType: redis
               displayName: Slave Nodes
               flexibleCloudlets: ${settings.cldts}
               count: ${settings.master}
               nodeGroup: slave_redis
+              if ( ${settings.public_ip} == true ):
+              extip: true
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:
