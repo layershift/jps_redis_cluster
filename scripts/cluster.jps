@@ -1,8 +1,7 @@
-_info : 'https://docs.cloudscripting.com/1.6.2/'
-version: 1.6.2
-build: 20200122
-type: update
-name: 'Redis_cluster'
+_info : 'https://docs.cloudscripting.com/1.9.4/'
+version: 1.9.4
+type: install
+name: 'Redis Cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
