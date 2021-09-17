@@ -5,6 +5,7 @@ name: 'Redis Cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
+success: /texts/success.txt
 logo: /images/Redis_cluster.png?_r=${fn.random}
 targetNodes: 
   nodeGroup: 'cp'
@@ -80,6 +81,7 @@ onInstall:
               nodeGroup: master_redis
               if ( ${settings.public_ip} == true ):
               extip: true
+              skipNodeEmails: true
             - nodeType: redis
               displayName: Slave Nodes
               flexibleCloudlets: ${settings.cldts}
@@ -87,6 +89,7 @@ onInstall:
               nodeGroup: slave_redis
               if ( ${settings.public_ip} == true ):
               extip: true
+              skipNodeEmails: true
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:
