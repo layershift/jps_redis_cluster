@@ -57,6 +57,7 @@ settings:
             type: checkbox
             name: public_ip
             default: false
+            hidden : true
       #Settings for selecting current Environment
         existingEnv:
           - caption: Environment
@@ -80,7 +81,7 @@ onInstall:
               count: ${settings.master}
               nodeGroup: master_redis
               if ( ${settings.public_ip} == true ):
-              extip: true
+                extip: true
               skipNodeEmails: true
             - nodeType: redis
               displayName: Slave Nodes
@@ -88,7 +89,7 @@ onInstall:
               count: ${settings.master}
               nodeGroup: slave_redis
               if ( ${settings.public_ip} == true ):
-              extip: true
+                extip: true
               skipNodeEmails: true
               onInstall:
               -edit_file :

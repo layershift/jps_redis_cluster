@@ -1,8 +1,8 @@
 _info : 'https://docs.cloudscripting.com/1.9.4/'
 version: 1.9.4
 type: update
-name: 'Redis Cluster '
-id: 'Redis_cluster'
+name: 'Redis Cluster_public_IP '
+id: 'Redis_cluster_public_IP'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/redis.jpg
@@ -50,7 +50,7 @@ onInstall:
   - config5 :
   - config6 :
   - config_cluster:
-      message: ${nodes.master_redis[0].address}:${settings.fm} ${nodes.master_redis[1].address}:${settings.sm} ${nodes.master_redis[2].address}:${settings.tm} ${nodes.slave_redis[0].address}:${settings.fs} ${nodes.slave_redis[1].address}:${settings.ss} ${nodes.slave_redis[2].address}:${settings.ts}
+      message: ${nodes.master_redis[0].extIPs}:${settings.fm} ${nodes.master_redis[1].extIPs}:${settings.sm} ${nodes.master_redis[2].extIPs}:${settings.tm} ${nodes.slave_redis[0].extIPs}:${settings.fs} ${nodes.slave_redis[1].extIPs}:${settings.ss} ${nodes.slave_redis[2].extIPs}:${settings.ts}
   - config_cluster:
       message: --cluster-replicas 1
   - api [master_redis, slave_redis]: environment.control.RestartNodes
@@ -217,7 +217,7 @@ actions:
           action: "ALLOW",
           direction: "INPUT",
           name: "Redis server",
-          src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
+          src: "${nodes.master_redis[0].extIPs},${nodes.master_redis[1].extIPs},${nodes.master_redis[2].extIPs},${nodes.slave_redis[0].extIPs},${nodes.slave_redis[1].extIPs},${nodes.slave_redis[2].extIPs}",
           ports: "7000-7005"
           }
   set-firewall-cluster :
@@ -228,6 +228,6 @@ actions:
               action: "ALLOW",
               direction: "INPUT",
               name: "Redis Cluster",
-              src: "${nodes.master_redis[0].address},${nodes.master_redis[1].address},${nodes.master_redis[2].address},${nodes.slave_redis[0].address},${nodes.slave_redis[1].address},${nodes.slave_redis[2].address}",
+              src: "${nodes.master_redis[0].extIPs},${nodes.master_redis[1].extIPs},${nodes.master_redis[2].extIPs},${nodes.slave_redis[0].extIPs},${nodes.slave_redis[1].extIPs},${nodes.slave_redis[2].extIPs}",
               ports: "17000-17005"
               }
