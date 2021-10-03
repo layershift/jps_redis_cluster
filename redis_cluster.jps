@@ -90,6 +90,12 @@ onInstall:
               if ( ${settings.public_ip} == true ):
               extip: true
               skipNodeEmails: true
+              onInstall:
+              -edit_file :
+              actions:
+              edit_file :
+                - cmd [master_redis, slave_redis] :
+                - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:
@@ -103,7 +109,7 @@ onInstall:
           - add_nodes1
           - add_nodes2
           - add_nodes3
-          
+          - edit_file
          actions:
           add_nodes1 :
             addNodes:
@@ -135,6 +141,9 @@ onInstall:
                     nodeGroup: slave_redis
                     displayName: Slave Nodes
                     flexibleCloudlets: 10
+          edit_file :
+            - cmd [master_redis, slave_redis] :
+            - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install:
       envName: ${settings.envName}

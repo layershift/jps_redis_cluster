@@ -1,13 +1,13 @@
 _info : 'https://docs.cloudscripting.com/1.9.4/'
 version: 1.9.4
-type: install
-name: 'Redis Cluster'
+type: update
+name: 'Redis Cluster '
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
-baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/redis.jpg
-targetNodes: 
-  nodeGroup: 'master_redis, slave_redis'
+targetNodes:
+  nodeGroup: 'master_redis'
 
 globals:
   pass: ${fn.password}
@@ -19,13 +19,21 @@ menu :
   action: status
 
 onInstall:
+# cleanup any previous cluster files
+  - uninstall:
 #Open firewall ports from 7000-7005 and 17000-17005
 #These ports are only opened for the internal IP of the nodes
   - set-firewall
   - set-firewall-cluster
 #Create configuration files for redis cluster
-  - createFile [master_redis]: /etc/redis/ips.txt
-  - createFile [master_redis, slave_redis] : /etc/redis/redis_cluster.conf
+  - cmd [master_redis]:
+    - touch /etc/redis/ips.txt
+    - chown jelastic /etc/redis/ips.txt
+    user: root
+  - cmd [master_redis, slave_redis]:
+    - touch /etc/redis/redis_cluster.conf
+    - chown jelastic /etc/redis/redis_cluster.conf
+    user: root
 #Create unique paswword on all 6 redis nodes
   - set_password :
   - api [master_redis, slave_redis]: environment.control.RestartNodes
@@ -45,13 +53,13 @@ onInstall:
       message: ${nodes.master_redis[0].address}:${settings.fm} ${nodes.master_redis[1].address}:${settings.sm} ${nodes.master_redis[2].address}:${settings.tm} ${nodes.slave_redis[0].address}:${settings.fs} ${nodes.slave_redis[1].address}:${settings.ss} ${nodes.slave_redis[2].address}:${settings.ts}
   - config_cluster:
       message: --cluster-replicas 1
-#Start redis server in a screen with the cluster configuration
-  - start_redis_server :
+  - api [master_redis, slave_redis]: environment.control.RestartNodes
+#Start redis cluster with the configuration file
   - start_redis_cluster:
 
 onUninstall:
   uninstall:
-  api [master_redis, slave_redis]: environment.control.RestartNodes
+
 settings:
 #The port settings are hidden from the customer and are used for the correct configuration
   fields:
@@ -159,7 +167,7 @@ actions:
   start_redis_cluster:
     nodeId: ${nodes.master_redis[0].id}
     cmd : 
-      /bin/echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt`
+      /bin/echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt` -a ${globals.pass}
   set_password:
     cmd [master_redis, slave_redis] :
       - /bin/sed -i 's/requirepass/#requirepass/g' /etc/redis.conf
@@ -167,11 +175,27 @@ actions:
       - sleep 5
     user: root
   uninstall:
-    cmd [master_redis, slave_redis] :
-      - rm -f /etc/redis/ips.txt
-      - rm -f /etc/redis/redis_cluster.conf
-      - rm -f /var/lib/redis/nodes.conf
-    user: root
+    - cmd [master_redis, slave_redis] :
+        - jem service stop || true
+        - rm -f /etc/redis/ips.txt
+        - echo "" > /etc/redis/redis_cluster.conf
+        - rm -f /var/lib/redis/nodes.conf
+        - rm -f /var/lib/redis/appendonly.aof
+        - rm -f /var/lib/redis/dump.rdb
+        - jem service start || true
+      user: root
+    - api [master_redis, slave_redis]: environment.control.restartservices
+    - script: |
+        var resp = api.env.security.GetRules("${env.name}", session);
+        var rules = resp.rules;
+        for (var i = 0, n = rules.length; i < n; i++) {
+          if (rules[i].name == "Redis Server" || rules[i].name == "Redis Cluster") {
+            var deleted = api.env.security.RemoveRule("${env.name}", session, rules[i].id);
+            api.marketplace.console.WriteLog("Deleted: " + rules[i].id + " " + deleted);
+          }
+        }
+        return { 'result': 0 };
+
   set-firewall :
     api[master_redis, slave_redis]:
       - method: environment.security.addrule
