@@ -94,9 +94,9 @@ onInstall:
               onInstall:
               -edit_file :
               actions:
-              edit_file :
-                - cmd [master_redis, slave_redis] :
-                - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
+                edit_file :
+                  - cmd [master_redis, slave_redis] :
+                  - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:

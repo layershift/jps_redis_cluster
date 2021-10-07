@@ -112,55 +112,31 @@ actions:
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.fm}
-    - nodeId: ${nodes.master_redis[0].id}
-      appendFile [master_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
   set_port1 :
     - nodeId: ${nodes.master_redis[1].id}
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.sm}
-    - nodeId: ${nodes.master_redis[1].id}
-      appendFile [master_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
   set_port2 :
     - nodeId: ${nodes.master_redis[2].id}
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.tm}
-    - nodeId: ${nodes.master_redis[2].id}
-      appendFile [master_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
   set_port3 :
     - nodeId: ${nodes.slave_redis[0].id}
       appendFile [slave_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.fs}
-    - nodeId: ${nodes.slave_redis[0].id}
-      appendFile [slave_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
   set_port4 :
     - nodeId: ${nodes.slave_redis[1].id}
       appendFile [slave_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.ss}
-    - nodeId: ${nodes.slave_redis[1].id}
-      appendFile [slave_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
   set_port5 :
     - nodeId: ${nodes.slave_redis[2].id}
       appendFile [slave_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.ts}
-    - nodeId: ${nodes.slave_redis[2].id}
-      appendFile [slave_redis]:
-      path: /etc/redis/redis_cluster.conf
-      body: masterauth ${globals.pass}
 
   config2:
     appendFile [master_redis, slave_redis]:
@@ -197,6 +173,7 @@ actions:
     cmd [master_redis, slave_redis] :
       - /bin/sed -i 's/requirepass/#requirepass/g' /etc/redis.conf
       - /bin/echo "requirepass ${globals.pass}" >> /etc/redis.conf
+      -/bin/echo "masterauth ${globals.pass}" >> /etc/redis.conf
       - sleep 5
     user: root
   uninstall:
