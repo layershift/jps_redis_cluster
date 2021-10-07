@@ -112,16 +112,28 @@ actions:
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.fm}
+    - nodeId: ${nodes.master_redis[0].id}
+      appendFile [master_redis]:
+      path: /etc/redis/redis_cluster.conf
+      body: masterauth ${globals.pass}
   set_port1 :
     - nodeId: ${nodes.master_redis[1].id}
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.sm}
+    - nodeId: ${nodes.master_redis[1].id}
+      appendFile [master_redis]:
+      path: /etc/redis/redis_cluster.conf
+      body: masterauth ${globals.pass}
   set_port2 :
     - nodeId: ${nodes.master_redis[2].id}
       appendFile [master_redis]:
       path: /etc/redis/redis_cluster.conf
       body: port ${settings.tm}
+    - nodeId: ${nodes.master_redis[2].id}
+      appendFile [master_redis]:
+      path: /etc/redis/redis_cluster.conf
+      body: masterauth ${globals.pass}
   set_port3 :
     - nodeId: ${nodes.slave_redis[0].id}
       appendFile [slave_redis]:
