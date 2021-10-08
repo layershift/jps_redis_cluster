@@ -6,8 +6,6 @@ id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/Redis_cluster.png?_r=${fn.random}
-targetNodes: 
-  nodeGroup: 'cp'
 categories:
  - apps/others
 
@@ -72,7 +70,7 @@ onInstall:
         region: ${settings.region}
         jps:
          type: install
-         name: Create Redis Cluster Environment
+         name: Redis Cluster
          nodes:
             - nodeType: redis
               displayName: Master Nodes
@@ -149,11 +147,14 @@ onInstall:
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install:
       envName: ${settings.envName}
-      jps:
-        type: update
-        name: Install Redis Cluster
-        onInstall:
-          - install:
-            jps: ${baseUrl}/scripts/cluster.jps
-        
-            
+      jps: ${baseUrl}/scripts/cluster.jps
+  - setGlobals:
+      success_text: ${response.successText}
+  - message: ${globals.success_text}
+    script: |
+      return {'result': 'success', 'message': message.replace(/<br \/>/g, '  \n')}
+#
+#
+#success:
+#  email: false
+#  text: ${globals.success_text}

@@ -1,13 +1,13 @@
-_info : 'https://docs.cloudscripting.com/1.9.4/'
-version: 1.9.4
+_info : 'https://docs.cloudscripting.com/6.1.2/'
+version: 6.1.2
 type: update
-name: 'Redis Cluster '
+name: 'Redis Cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/redis.jpg
 targetNodes:
-  nodeGroup: 'master_redis'
+  nodeGroup: master_redis
 
 globals:
   pass: ${fn.password}
