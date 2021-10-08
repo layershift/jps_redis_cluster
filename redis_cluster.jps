@@ -83,6 +83,8 @@ onInstall:
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
+              env:
+                ADMINPANEL_ENABLED: false
             - nodeType: redis
               displayName: Slave Nodes
               flexibleCloudlets: ${settings.cldts}
@@ -91,6 +93,8 @@ onInstall:
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
+              env:
+                ADMINPANEL_ENABLED: false
 
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
@@ -117,6 +121,8 @@ onInstall:
                     nodeGroup: slave_redis
                     displayName: Slave Nodes
                     flexibleCloudlets: 10
+                    env:
+                      ADMINPANEL_ENABLED: false
           add_nodes2 :  
             addNodes:
                   - nodeType: redis
@@ -127,6 +133,8 @@ onInstall:
                     nodeGroup: slave_redis
                     displayName: Slave Nodes
                     flexibleCloudlets: 10
+                    env:
+                      ADMINPANEL_ENABLED: false
           add_nodes3 :
             addNodes:
                   - nodeType: redis
@@ -137,6 +145,8 @@ onInstall:
                     nodeGroup: slave_redis
                     displayName: Slave Nodes
                     flexibleCloudlets: 10
+                    env:
+                      ADMINPANEL_ENABLED: false
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install:
       envName: ${settings.envName}
