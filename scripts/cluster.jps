@@ -35,7 +35,7 @@ onInstall:
     - chown jelastic /etc/redis/redis_cluster.conf
     user: root
 #Create unique paswword on all 6 redis nodes
-  - set_password :
+  - set_configuration :
   - api [master_redis, slave_redis]: environment.control.RestartNodes
 #Add confifuration to the files
   - set_port :
@@ -171,11 +171,12 @@ actions:
     nodeId: ${nodes.master_redis[0].id}
     cmd : 
       /bin/echo "yes" | /usr/bin/redis-cli --cluster create `cat /etc/redis/ips.txt` -a ${globals.pass}
-  set_password:
+  set_configuration:
     cmd [master_redis, slave_redis] :
       - /bin/sed -i 's/requirepass/#requirepass/g' /etc/redis.conf
       - /bin/echo "requirepass ${globals.pass}" >> /etc/redis.conf
       - /bin/echo "masterauth ${globals.pass}" >> /etc/redis/redis_cluster.conf
+      - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
       - sleep 5
     user: root
   uninstall:
