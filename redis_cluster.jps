@@ -1,11 +1,10 @@
-_info : 'https://docs.cloudscripting.com/1.9.4/'
-version: 1.9.4
+_info : 'https://docs.cloudscripting.com/6.1.2/'
+version: 6.1.2
 type: install
 name: 'Redis Cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
-baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/
-success: /texts/success.txt
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/Redis_cluster.png?_r=${fn.random}
 targetNodes: 
   nodeGroup: 'cp'
@@ -155,6 +154,6 @@ onInstall:
         name: Install Redis Cluster
         onInstall:
           - install:
-            jps: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/scripts/cluster.jps
+            jps: ${baseUrl}/scripts/cluster.jps
         
             
