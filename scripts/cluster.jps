@@ -56,6 +56,9 @@ onInstall:
   - api [master_redis, slave_redis]: environment.control.RestartNodes
 #Start redis cluster with the configuration file
   - start_redis_cluster:
+  - message: "Conenct to the following nodes:\n ${nodes.master_redis[0].address}:${settings.fm} ${nodes.master_redis[1].address}:${settings.sm} ${nodes.master_redis[2].address}:${settings.tm} ${nodes.slave_redis[0].address}:${settings.fs} ${nodes.slave_redis[1].address}:${settings.ss} ${nodes.slave_redis[2].address}:${settings.ts}\n using password: ${globals.pass}"
+    script: |
+      return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
 
 onUninstall:
   uninstall:
