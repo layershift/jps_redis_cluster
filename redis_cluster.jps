@@ -37,12 +37,12 @@ settings:
             name: region
             disableInactive: true
             selectFirstAvailable: true
-          - caption: Number of Master servers
+          - caption: Number of nodes
             type: spinner
-            name: master
+            name: redisNodes
             increment: 0
-            default: 3
-            min: 3
+            default: 6
+            min: 6
             hidden: false
           - caption: Cloudlets
             type: spinner
@@ -73,26 +73,15 @@ onInstall:
          name: Redis Cluster
          nodes:
             - nodeType: redis
-              displayName: Master Nodes
+              displayName: Redis Nodes
               flexibleCloudlets: ${settings.cldts}
-              count: ${settings.master}
-              nodeGroup: master_redis
+              count: ${settings.redisNodes}
+              nodeGroup: redisNodes
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
               env:
                 ADMINPANEL_ENABLED: false
-            - nodeType: redis
-              displayName: Slave Nodes
-              flexibleCloudlets: ${settings.cldts}
-              count: ${settings.master}
-              nodeGroup: slave_redis
-              if ( ${settings.public_ip} == true ):
-                extip: true
-              skipNodeEmails: true
-              env:
-                ADMINPANEL_ENABLED: false
-
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:
@@ -112,7 +101,7 @@ onInstall:
             addNodes:
                   - nodeType: redis
                     nodeGroup: master_redis
-                    displayName: Master Nodes
+                    displayName: Redis Nodes
                     flexibleCloudlets: 10
                   - nodeType: redis
                     nodeGroup: slave_redis
