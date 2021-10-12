@@ -39,7 +39,7 @@ settings:
             selectFirstAvailable: true
           - caption: Number of nodes
             type: spinner
-            name: redisNodes
+            name: redis_nodes
             increment: 0
             default: 6
             min: 6
@@ -75,8 +75,8 @@ onInstall:
             - nodeType: redis
               displayName: Redis Nodes
               flexibleCloudlets: ${settings.cldts}
-              count: ${settings.redisNodes}
-              nodeGroup: redisNodes
+              count: ${settings.redis_nodes}
+              nodeGroup: redis_nodes
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
