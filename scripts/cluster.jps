@@ -1,13 +1,13 @@
-_info : 'https://docs.cloudscripting.com/1.9.4/'
-version: 1.9.4
+_info : 'https://docs.cloudscripting.com/6.1.2/'
+version: 6.1.2
 type: update
-name: 'Redis Cluster '
+name: 'Redis Cluster'
 id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/redis.jpg
 targetNodes:
-  nodeGroup: 'master_redis'
+  nodeGroup: master_redis
 
 globals:
   pass: ${fn.password}
@@ -56,6 +56,9 @@ onInstall:
   - api [master_redis, slave_redis]: environment.control.RestartNodes
 #Start redis cluster with the configuration file
   - start_redis_cluster:
+  - message: "Conenct to the following nodes:\n ${nodes.master_redis[0].address}:${settings.fm} ${nodes.master_redis[1].address}:${settings.sm} ${nodes.master_redis[2].address}:${settings.tm} ${nodes.slave_redis[0].address}:${settings.fs} ${nodes.slave_redis[1].address}:${settings.ss} ${nodes.slave_redis[2].address}:${settings.ts}\n using password: ${globals.pass}"
+    script: |
+      return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
 
 onUninstall:
   uninstall:
