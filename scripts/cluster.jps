@@ -7,6 +7,7 @@ homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/1-node-group
 logo: /images/redis.jpg
 targetNodes:
+  targetNodes: 
   nodeGroup: 'redis_nodes'
 
 globals:
