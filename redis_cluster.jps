@@ -93,7 +93,7 @@ onInstall:
           - add_nodes: 
               count: ${settings.redis_nodes}
               cloudlets: ${settings.cldts}
-​
+
           actions:
             add_nodes:
               node:
@@ -109,18 +109,14 @@ onInstall:
               script: |               
                 return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${this.count}).fill(JSON.parse(node)) } }
       
-
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
-  - install:
-      envName: ${settings.envName}
-      jps: ${baseUrl}/scripts/cluster.jps
+  - install: ${baseUrl}/scripts/cluster.jps
+    envName: ${settings.envName}
+    pass: ${fn.password}
+    nodeGroup: redis_nodes
+
   - setGlobals:
       success_text: ${response.successText}
   - message: ${globals.success_text}
     script: |
       return {'result': 'success', 'message': message.replace(/<br \/>/g, '  \n')}
-#
-#
-#success:
-#  email: false
-#  text: ${globals.success_text}
