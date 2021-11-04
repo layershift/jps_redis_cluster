@@ -1,0 +1,40 @@
+_info : 'https://docs.cloudscripting.com/6.1.2/'
+version: 6.1.2
+type: update
+name: 'Redis Cluster Tools'
+id: 'redis_cluster_tools'
+homepage: https://github.com/layershift/jps_redis_cluster
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/1-node-group
+logo: /images/redis.jpg
+description:
+  short: Redis Cluster Tools.
+
+targetNodes:
+  targetNodes: 
+  nodeGroup: 'redis_nodes'
+
+globals:
+  pass: ${fn.password}
+
+#This doesn't work properly yet, still improving
+menu :
+- confirmText: Execute "cluster nodes"?
+  caption: Show Cluster Nodes
+  action: showClusterNodes
+
+- caption: Show connection information
+  action: showConnectionInformation
+
+actions:
+  showConnectionInformation :
+    - message: "Conenct to the following nodes:\n ${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts}\n using password: ${globals.pass}"
+      script: |
+        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
+  showClusterNodes :
+    - cmd[${nodes.redis_nodes[0].id}]:
+        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes
+      user: root
+    - message: ${response.out}
+      script: |
+        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}

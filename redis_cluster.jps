@@ -90,24 +90,20 @@ onInstall:
           type: update
           name: add nodes
           onInstall:
-          - add_nodes: 
-              count: ${settings.redis_nodes}
-              cloudlets: ${settings.cldts}
-
-          actions:
-            add_nodes:
-              node:
-                nodeType: redis
-                displayName: Redis Nodes
-                fixedCloudlets: 1
-                flexibleCloudlets: ${this.cloudlets}
-                nodeGroup: redis_nodes
+            node:
+              nodeType: redis
+              fixedCloudlets: 1
+              flexibleCloudlets: ${settings.cldts}
+              nodeGroup: redis_nodes
+              options:
                 skipNodeEmails: true
-                metadata:
-                  dockerEnvVars:
-                    ADMINPANEL_ENABLED: false
-              script: |               
-                return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${this.count}).fill(JSON.parse(node)) } }
+              skipNodeEmails: true
+              metadata:
+                dockerEnvVars:
+                  ADMINPANEL_ENABLED: false
+            script: |               
+              return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
+
       
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install: ${baseUrl}/scripts/cluster.jps

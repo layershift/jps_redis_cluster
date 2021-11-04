@@ -6,18 +6,15 @@ id: 'redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/1-node-group
 logo: /images/redis.jpg
+description:
+  short: Redis Cluster is configured.
+
 targetNodes:
   targetNodes: 
   nodeGroup: 'redis_nodes'
 
 globals:
   pass: ${fn.password}
-
-#This doesn't work properly yet, still improving
-menu :
-- confirmText: check redis status
-  caption: check redis status
-  action: status
 
 onInstall:
 # cleanup any previous cluster files
@@ -57,6 +54,11 @@ onInstall:
   - api [redis_nodes]: environment.control.RestartNodes
 #Start redis cluster with the configuration file
   - start_redis_cluster:
+  - install: ${baseUrl}/scripts/clusterTools.jps
+    envName: ${settings.envName}
+    pass: ${globals.pass}
+    nodeGroup: redis_nodes
+
   - message: "Conenct to the following nodes:\n ${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts}\n using password: ${globals.pass}"
     script: |
       return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
@@ -227,3 +229,4 @@ actions:
               src: "${nodes.redis_nodes[0].address},${nodes.redis_nodes[1].address},${nodes.redis_nodes[2].address},${nodes.redis_nodes[3].address},${nodes.redis_nodes[4].address},${nodes.redis_nodes[5].address}",
               ports: "17000-17005"
               }
+  
