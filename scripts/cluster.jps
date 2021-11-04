@@ -16,6 +16,12 @@ targetNodes:
 globals:
   pass: ${fn.password}
 
+menu :
+- confirmText: Do you want to see the cluster password?
+  caption: Show Cluster Password
+  action: showClusterPassword
+
+
 onInstall:
 # cleanup any previous cluster files
   - uninstall:
@@ -55,7 +61,7 @@ onInstall:
 #Start redis cluster with the configuration file
   - start_redis_cluster:
   - install: ${baseUrl}/scripts/clusterTools.jps
-    envName: ${settings.envName}
+    envName: ${env.envName}
     pass: ${globals.pass}
     nodeGroup: redis_nodes
 
@@ -230,3 +236,7 @@ actions:
               ports: "17000-17005"
               }
   
+  showClusterPassword : 
+    - message: "Cluster password is ${globals.pass}"
+      script: |
+        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}

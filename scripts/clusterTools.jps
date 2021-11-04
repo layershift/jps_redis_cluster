@@ -16,7 +16,6 @@ targetNodes:
 globals:
   pass: ${fn.password}
 
-#This doesn't work properly yet, still improving
 menu :
 - confirmText: Execute "cluster nodes"?
   caption: Show Cluster Nodes
@@ -24,6 +23,77 @@ menu :
 
 - caption: Show connection information
   action: showConnectionInformation
+
+settings:
+  main:
+    fields:
+    - name: setPassword
+      type: radiolist
+      caption: Set Password?
+      default: NoSetPassword
+      columns: 2
+      values:
+        - caption: Random Password
+          value: NoSetPassword
+        - caption: Custom password
+          value: YesSetPassword
+      showIf:
+        YesSetPassword:
+          - name: customPassword
+            caption: Cluster Password
+            type: string
+            value: 
+#The port settings are hidden from the customer and are used for the correct configuration
+  fields:
+  - caption: First master Port Number
+    type: spinner
+    name: fm
+    increment: 1
+    default: 7000
+    min: 1
+    hidden: true
+  - caption: second master Port Number
+    type: spinner
+    name: sm
+    increment: 1
+    default: 7001
+    min: 1
+    hidden: true
+  - caption: third master Port Number
+    type: spinner
+    name: tm
+    increment: 1
+    default: 7002
+    min: 1
+    hidden: true
+  - caption: First slave Port Number
+    type: spinner
+    name: fs
+    increment: 1
+    default: 7003
+    min: 1
+    hidden: true
+  - caption: second slave Port Number
+    type: spinner
+    name: ss
+    increment: 1
+    default: 7004
+    min: 1
+    hidden: true
+  - caption: third slave Port Number
+    type: spinner
+    name: ts
+    increment: 1
+    default: 7005
+    min: 1  
+    hidden: true
+
+
+onInstall:
+  - assert:
+      condition: "'${settings.setPassword} == 'YesSetPassword'"
+      setGlobals:
+        pass: ${settings.customPassword}
 
 actions:
   showConnectionInformation :
