@@ -10,7 +10,6 @@ description:
   short: Redis Cluster Tools.
 
 targetNodes:
-  targetNodes: 
   nodeGroup: 'redis_nodes'
 
 globals:
@@ -25,25 +24,6 @@ menu :
   action: showConnectionInformation
 
 settings:
-  main:
-    fields:
-    - name: setPassword
-      type: radiolist
-      caption: Set Password?
-      default: NoSetPassword
-      columns: 2
-      values:
-        - caption: Random Password
-          value: NoSetPassword
-        - caption: Custom password
-          value: YesSetPassword
-      showIf:
-        YesSetPassword:
-          - name: customPassword
-            caption: Cluster Password
-            type: string
-            value: 
-#The port settings are hidden from the customer and are used for the correct configuration
   fields:
   - caption: First master Port Number
     type: spinner
@@ -87,11 +67,30 @@ settings:
     default: 7005
     min: 1  
     hidden: true
+  main:
+    fields:
+    - name: setPassword
+      type: radiolist
+      caption: Set Password?
+      default: NoSetPassword
+      columns: 2
+      values:
+        - caption: Random Password
+          value: NoSetPassword
+        - caption: Custom password
+          value: YesSetPassword
+      showIf:
+        YesSetPassword:
+          - name: customPassword
+            caption: Cluster Password
+            type: string
+            value: 
+#The port settings are hidden from the customer and are used for the correct configuration
 
 
 onInstall:
   - assert:
-      condition: "'${settings.setPassword} == 'YesSetPassword'"
+      condition: "'${settings.setPassword}' == 'YesSetPassword'"
       setGlobals:
         pass: ${settings.customPassword}
 

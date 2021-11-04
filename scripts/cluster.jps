@@ -10,7 +10,6 @@ description:
   short: Redis Cluster is configured.
 
 targetNodes:
-  targetNodes: 
   nodeGroup: 'redis_nodes'
 
 globals:
