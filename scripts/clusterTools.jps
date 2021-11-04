@@ -13,7 +13,7 @@ targetNodes:
   nodeGroup: 'redis_nodes'
 
 globals:
-  pass: ${fn.password}
+  pass: "${settings.redisClusterPassword}"
 
 menu :
 - confirmText: Execute "cluster nodes"?
@@ -24,24 +24,12 @@ menu :
   action: showConnectionInformation
 
 settings:
-  main:
     fields:
-    - name: setPassword
-      type: radiolist
-      caption: Set Password?
-      default: NoSetPassword
-      columns: 2
-      values:
-        - caption: Random Password
-          value: NoSetPassword
-        - caption: Custom password
-          value: YesSetPassword
-      showIf:
-        YesSetPassword:
-          - name: customPassword
-            caption: Cluster Password
-            type: string
-            value: 
+    - name: redisClusterPassword
+      caption: Cluster Password
+      type: string
+      value: 
+
     - caption: First master Port Number
       type: spinner
       name: fm
@@ -87,12 +75,6 @@ settings:
 
 #The port settings are hidden from the customer and are used for the correct configuration
 
-
-onInstall:
-  - assert:
-      condition: "'${settings.setPassword}' == 'YesSetPassword'"
-      setGlobals:
-        pass: ${settings.customPassword}
 
 actions:
   showConnectionInformation :
