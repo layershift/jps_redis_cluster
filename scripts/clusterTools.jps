@@ -95,7 +95,7 @@ actions:
   
   pingClusterNodes :
     - cmd[${nodes.redis_nodes[0].id}]:
-        - for node in $(redis-cli -p 7000 -a ${globals.pass} cluster nodes 2>/dev/null | awk '{print $2}' | awk -F "@" '{print $1}'); do redis-cli $(echo $node| awk -F":" '{print "-h "$1" -p "$2}') -a ${globals.pass} ping 2>/dev/null | awk '{print "'$node' "$0}'; done;
+        - for node in $(redis-cli -p 7000 -a ${globals.pass} cluster nodes 2>/dev/null | awk '{print $2}' | awk -F "@" '{print $1}'); do redis-cli $(echo $node| awk -F":" '{print "-h "$1" -p "$2}') -a ${globals.pass} ping 2>/dev/null | awk '{print "'$node' "$0}'; done | awk '{printf "%-20s %s\n",$1,$2}'
       user: root
     - message: ${response.out}
       script: |
