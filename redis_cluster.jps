@@ -37,30 +37,30 @@ settings:
             name: region
             disableInactive: true
             selectFirstAvailable: true
-          - caption: Number of Master servers
-            type: spinner
-            name: master
-            increment: 0
-            default: 3
-            min: 3
-            hidden: false
-          - caption: Cloudlets
-            type: spinner
-            name: cldts
-            increment: 2
-            default: 10
-            min: 4
-          - caption: Public IP
-            type: checkbox
-            name: public_ip
-            default: false
-            hidden : true
       #Settings for selecting current Environment
         existingEnv:
           - caption: Environment
             type: envlist
             name: envName
             valueField: shortdomain
+    - caption: Number of nodes
+      type: spinner
+      name: redis_nodes
+      increment: 0
+      default: 6
+      min: 6
+      hidden: false
+    - caption: Cloudlets
+      type: spinner
+      name: cldts
+      increment: 2
+      default: 10
+      min: 4
+    - caption: Public IP
+      type: checkbox
+      name: public_ip
+      default: false
+      hidden : true
 
 onInstall:
   # Create appropriate environment with settings selected in previous screen
@@ -73,88 +73,46 @@ onInstall:
          name: Redis Cluster
          nodes:
             - nodeType: redis
-              displayName: Master Nodes
+              displayName: Redis Nodes
               flexibleCloudlets: ${settings.cldts}
-              count: ${settings.master}
-              nodeGroup: master_redis
+              count: ${settings.redis_nodes}
+              nodeGroup: redis_nodes
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
               env:
                 ADMINPANEL_ENABLED: false
-            - nodeType: redis
-              displayName: Slave Nodes
-              flexibleCloudlets: ${settings.cldts}
-              count: ${settings.master}
-              nodeGroup: slave_redis
-              if ( ${settings.public_ip} == true ):
-                extip: true
-              skipNodeEmails: true
-              env:
-                ADMINPANEL_ENABLED: false
-
   #Add nodes to the Environment previously selected
   - if (settings.mode == 'existingEnv'): 
       install:
         envName: ${settings.envName}
         jps:
-         type: update
-         name: add nodes
-         onInstall:
-          #Jelastic doesn't provide with a clean way to add multiple node to an existing Environment
-          #so I had to run the same action 3  times.
-          - add_nodes1
-          - add_nodes2
-          - add_nodes3
+          type: update
+          name: add nodes
+          onInstall:
+            node:
+              nodeType: redis
+              fixedCloudlets: 1
+              flexibleCloudlets: ${settings.cldts}
+              nodeGroup: redis_nodes
+              options:
+                skipNodeEmails: true
+              skipNodeEmails: true
+              metadata:
+                dockerEnvVars:
+                  ADMINPANEL_ENABLED: false
+            script: |               
+              return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
 
-         actions:
-          add_nodes1 :
-            addNodes:
-                  - nodeType: redis
-                    nodeGroup: master_redis
-                    displayName: Master Nodes
-                    flexibleCloudlets: 10
-                  - nodeType: redis
-                    nodeGroup: slave_redis
-                    displayName: Slave Nodes
-                    flexibleCloudlets: 10
-                    env:
-                      ADMINPANEL_ENABLED: false
-          add_nodes2 :  
-            addNodes:
-                  - nodeType: redis
-                    nodeGroup: master_redis
-                    displayName: Master Nodes
-                    flexibleCloudlets: 10
-                  - nodeType: redis
-                    nodeGroup: slave_redis
-                    displayName: Slave Nodes
-                    flexibleCloudlets: 10
-                    env:
-                      ADMINPANEL_ENABLED: false
-          add_nodes3 :
-            addNodes:
-                  - nodeType: redis
-                    nodeGroup: master_redis
-                    displayName: Master Nodes
-                    flexibleCloudlets: 10
-                  - nodeType: redis
-                    nodeGroup: slave_redis
-                    displayName: Slave Nodes
-                    flexibleCloudlets: 10
-                    env:
-                      ADMINPANEL_ENABLED: false
+      
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
-  - install:
-      envName: ${settings.envName}
-      jps: ${baseUrl}/scripts/cluster.jps
+  - install: ${baseUrl}/scripts/cluster.jps
+    envName: ${settings.envName}
+    pass: ${fn.password}
+    nodeGroup: redis_nodes
+
   - setGlobals:
       success_text: ${response.successText}
   - message: ${globals.success_text}
     script: |
       return {'result': 'success', 'message': message.replace(/<br \/>/g, '  \n')}
-#
-#
-#success:
-#  email: false
-#  text: ${globals.success_text}
