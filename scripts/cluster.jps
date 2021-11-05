@@ -221,7 +221,7 @@ actions:
           action: "ALLOW",
           direction: "INPUT",
           name: "Redis server",
-          src: "${nodes.redis_nodes[0].address},${nodes.redis_nodes[1].address},${nodes.redis_nodes[2].address},${nodes.redis_nodes[3].address},${nodes.redis_nodes[4].address},${nodes.redis_nodes[5].address}",
+          src: "ALL",
           ports: "7000-7005"
           }
   set-firewall-cluster :
