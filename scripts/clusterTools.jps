@@ -23,6 +23,9 @@ menu :
 - caption: Show connection information
   action: showConnectionInformation
 
+- caption: Ping cluster nodes?
+  action: pingClusterNodes
+
 settings:
     fields:
     - name: redisClusterPassword
@@ -84,8 +87,17 @@ actions:
 
   showClusterNodes :
     - cmd[${nodes.redis_nodes[0].id}]:
-        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes | awk '{printf "%25-s %s\n" ,$2,$3}'
+        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes 2>/dev/null | awk '{printf "%25-s %s\n" ,$2,$3}'
       user: root
     - message: ${response.out}
       script: |
         return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+  
+  pingClusterNodes :
+    - cmd[${nodes.redis_nodes[0].id}]:
+        - for node in $(redis-cli -p 7000 -a ${globals.pass} cluster nodes 2>/dev/null | awk '{print $2}' | awk -F "@" '{print $1}'); do redis-cli $(echo $node| awk -F":" '{print "-h "$1" -p "$2}') -a ${globals.pass} ping 2>/dev/null | awk '{print "'$node' "$0}'; done;
+      user: root
+    - message: ${response.out}
+      script: |
+        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
