@@ -5,7 +5,7 @@ name: 'Redis Cluster Tools'
 id: 'redis_cluster_tools'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/1-node-group
-logo: /images/redis.jpg
+logo: /images/Redis_cluster.png?_r=${fn.random}
 description:
   short: Redis Cluster Tools.
 
