@@ -1,15 +1,18 @@
-_info : 'https://docs.cloudscripting.com/1.9.4/'
-version: 1.9.4
+_info : 'https://docs.cloudscripting.com/6.1.2/'
+version: 6.1.2
 type: update
-name: 'Redis Cluster'
-id: 'Redis_cluster'
+name: 'Redis Cluster GUI'
+id: 'Redis_cluster_gui'
 homepage: https://github.com/layershift/jps_redis_cluster
-baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main/redis_cluster.jps
-logo: /images/redis.jpg
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
+logo: /images/Redis_cluster.png?_r=${fn.random}
+description:
+  short: Redis Cluster GUI
+
 globals:
   pass: ${fn.password}
 targetNodes: 
-  nodeGroup: 'master_redis'
+  nodeGroup: 'redis_nodes'
 
 buttons:
     - caption: Status
