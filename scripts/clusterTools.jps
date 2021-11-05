@@ -84,7 +84,7 @@ actions:
 
   showClusterNodes :
     - cmd[${nodes.redis_nodes[0].id}]:
-        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes
+        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes | awk '{printf "%25-s %s\n" ,$2,$3}'
       user: root
     - message: ${response.out}
       script: |
