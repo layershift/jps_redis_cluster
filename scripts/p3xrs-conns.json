@@ -1,0 +1,15 @@
+{
+    "update": "__replace_me_date__",
+    "list": [
+        {
+            "awsElastiCache": false,
+            "azure": false,
+            "name": "__replace_me_name__",
+            "host": "__replace_me_host__",
+            "port": "__replace_me_port__",
+            "password": "__replace_me_password__",
+            "cluster": true,
+            "nodes": []
+        }
+    ]
+}

@@ -127,40 +127,23 @@ actions:
             - systemctl enable --now nginx
             - npm install p3x-redis-ui -g
             #Configure p3x-redis-ui  as described https://github.com/patrikx3/redis-ui/blob/HEAD/artifacts/readme/start-up-server.md
-            - useradd -s /sbin/nologin p3x-redis-ui
-            - if [ -f /etc/systemd/system/p3x-redis-ui.service ]; then rm -rf /etc/systemd/system/p3x-redis-ui.service; fi
-            - echo "[Unit]" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "Description=p3x-redis" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "After=network.target" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "[Service]" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "Type=simple" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "User=p3x-redis-ui" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "WorkingDirectory=/home/p3x-redis-ui" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "# or if you want readonly connections as it is public" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "#ExecStart=/usr/bin/p3x-redis --readonly-connections" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "#ExecStart=/usr/bin/p3x-redis --readonly-connections --config /home/p3x-redis-ui/p3xrs.json" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "ExecStart=/usr/bin/p3x-redis" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "Restart=on-abort" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "[Install]" >> /etc/systemd/system/p3x-redis-ui.service
-            - echo "WantedBy=multi-user.target" >> /etc/systemd/system/p3x-redis-ui.service
+            - useradd --gid 700 --no-user-group --create-home --non-unique --uid 700 -s /sbin/nologin p3x-redis-ui
+            - curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.service' -o /etc/systemd/system/p3x-redis-ui.service;
             - systemctl daemon-reload
             - systemctl enable p3x-redis-ui
+            - curl -fsSL '${baseUrl}/scripts/p3xrs.json' -o /home/p3x-redis-ui/p3xrs.json;
+            - curl -fsSL '${baseUrl}/scripts/p3xrs-conns.json' -o /home/p3x-redis-ui/.p3xrs-conns.json;
+            - sed "s#__replace_me_date__#$(date +%FT%T.%3NZ)#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            - sed "s#__replace_me_name__#${nodes.redis_nodes[0].address}:${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            - sed "s#__replace_me_host__#${nodes.redis_nodes[0].address}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            - sed "s#\"__replace_me_port__\"#${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            - sed "s#__replace_me_password__#${globals.pass}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
             - service p3x-redis-ui start
             #configure nginx to redirect to p3x-redis-ui localhost 7843 as described https://github.com/patrikx3/redis-ui/blob/HEAD/artifacts/readme/start-up-server.md
-            - if [ -f /etc/nginx/default.d/p3x-redis-ui.conf ]; then rm -rf /etc/nginx/default.d/p3x-redis-ui.conf; fi
-            - echo "location / {" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "proxy_pass \"http://127.0.0.1:7843\";" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "proxy_set_header X-Forwarded-For \$remote_addr;" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "proxy_set_header Host \$host;" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "proxy_set_header Upgrade \$http_upgrade;" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "proxy_set_header Connection "upgrade";" >> /etc/nginx/default.d/p3x-redis-ui.conf
-            - /bin/echo "}" >> /etc/nginx/default.d/p3x-redis-ui.conf
+            - curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.conf' -o /etc/nginx/default.d/p3x-redis-ui.conf;
             #password protect nginx  described https://ubiq.co/tech-blog/how-to-password-protect-directory-in-nginx/
             - if [ -f /etc/nginx/conf.d/.htpasswd ]; then rm -rf /etc/nginx/conf.d/.htpasswd; fi 
             - /bin/htpasswd -b -c /etc/nginx/conf.d/.htpasswd developer ${globals.pass}
-            - if [ -f /etc/nginx/default.d/nginx_passwd.conf ]; then rm -rf /etc/nginx/default.d/nginx_passwd.conf; fi 
-            - /bin/echo "auth_basic \"Restricted Access!\";" >> /etc/nginx/default.d/nginx_passwd.conf
-            - /bin/echo "auth_basic_user_file /etc/nginx/conf.d/.htpasswd;" >> /etc/nginx/default.d/nginx_passwd.conf
             - systemctl restart nginx
             #- /bin/echo "${globals.pass}" >> /tmp/pass
       user: root

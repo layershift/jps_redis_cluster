@@ -1,0 +1,14 @@
+[Unit]
+Description=p3x-redis
+After=network.target
+[Service]
+Type=simple
+User=p3x-redis-ui
+WorkingDirectory=/home/p3x-redis-ui
+# or if you want readonly connections as it is public
+#ExecStart=/usr/bin/p3x-redis --readonly-connections
+ExecStart=/usr/bin/p3x-redis --config /home/p3x-redis-ui/p3xrs.json
+#ExecStart=/usr/bin/p3x-redis
+Restart=on-abort
+[Install]
+WantedBy=multi-user.target
