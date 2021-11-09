@@ -94,7 +94,8 @@ onInstall:
 actions:
   showConnectionInformation:
     return:
-      result: ${baseUrl}/texts/clusterToolsShowConnectionInformation.md
+      result: success
+      message: ${baseUrl}/texts/clusterToolsShowConnectionInformation.md
 
   showClusterNodes:
     - cmd[${nodes.redis_nodes[0].id}]:
@@ -164,4 +165,5 @@ actions:
 
   generateURL:
     return:
-      result: ${baseUrl}/texts/clusterToolsShowConnectionInformation.md
+      result: success
+      message: ${baseUrl}/texts/clusterToolsGenerateURL.md
