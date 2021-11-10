@@ -111,8 +111,6 @@ onInstall:
     pass: ${fn.password}
     nodeGroup: redis_nodes
 
-  - setGlobals:
-      success_text: ${response.successText}
-  - message: ${globals.success_text}
-    script: |
-      return {'result': 'success', 'message': message.replace(/<br \/>/g, '  \n')}
+  - return:
+      result: success
+      message: ${baseUrl}/texts/clusterSuccess.md
