@@ -6,12 +6,16 @@ id: 'Redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/Redis_cluster.png?_r=${fn.random}
+
 categories:
  - apps/others
 
 description:
   short: Easy way to deploy Redis Cluster configuration
-  
+
+globals:
+  pass: ${settings.redisClusterPassword}
+
 settings:
   fields:
     - type: radiolist
@@ -61,6 +65,11 @@ settings:
       name: public_ip
       default: false
       hidden : true
+    - name: redisClusterPassword
+      caption: Cluster Password
+      type: string
+      value: 
+      hidden: true
 
 onInstall:
   # Create appropriate environment with settings selected in previous screen
@@ -104,11 +113,13 @@ onInstall:
             script: |               
               return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
 
-      
+  - if (${globals.pass} == ""):
+    setGlobals:
+      pass: ${fn.password}
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install: ${baseUrl}/scripts/cluster.jps
     envName: ${settings.envName}
-    pass: ${fn.password}
+    pass: ${globals.pass}
     nodeGroup: redis_nodes
 
   - return:

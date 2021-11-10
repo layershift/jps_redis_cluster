@@ -17,18 +17,21 @@ globals:
   authSecret: ${fn.password(24)}
 
 menu :
-- confirmText: Execute "cluster nodes"?
-  caption: Show Cluster Nodes
+- caption: Show Cluster Nodes
   action: showClusterNodes
+  confirmText: Run "cluster nodes" redis command and show the output?
 
 - caption: Show connection information
   action: showConnectionInformation
+  confirmText: Do you wish to display the cluster connection information?
 
-- caption: Ping cluster nodes?
+- caption: Ping cluster nodes
   action: pingClusterNodes
+  confirmText: Do you wish to run "ping" redis command on all cluster nodes?
 
 - caption: Update P3X-Redis-UI
   action: updateP3XRedisUI
+  confirmText: Do you wish to update p3x-redis-ui application?
 
 buttons:
 - caption: p3x-redis-ui

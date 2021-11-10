@@ -13,7 +13,7 @@ targetNodes:
   nodeGroup: 'redis_nodes'
 
 globals:
-  pass: ${fn.password}
+  pass: ${settings.redisClusterPassword}
 
 menu :
 - confirmText: Do you want to see the cluster password?
@@ -22,6 +22,10 @@ menu :
 
 
 onInstall:
+#Set ranadom password if global pass is empty
+  - if (${globals.pass} == ""):
+    setGlobals:
+      pass: ${fn.password}
 # cleanup any previous cluster files
   - uninstall:
 #Open firewall ports from 7000-7005 and 17000-17005
@@ -74,6 +78,11 @@ onUninstall:
 settings:
 #The port settings are hidden from the customer and are used for the correct configuration
   fields:
+  - name: redisClusterPassword
+    caption: Cluster Password
+    type: string
+    value: 
+    hidden: true
   - caption: First master Port Number
     type: spinner
     name: fm
