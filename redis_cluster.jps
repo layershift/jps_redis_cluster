@@ -177,6 +177,12 @@ onInstall:
   - log: ${response.nodes}
   - setGlobals: 
       nodes: ${response.nodes}
+
+  - api[redis_nodes]: env.control.ApplyNodeGroupData
+    data: 
+      isResetServicePassword: false
+      adminUrl: https://developer:${globals.pass}@node${globals.nodes[0].id}-${settings.envName}/connect/
+
   - return:
       result: success
       message: ${baseUrl}/texts/clusterSuccess.md
