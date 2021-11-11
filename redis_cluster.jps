@@ -65,13 +65,61 @@ settings:
       name: public_ip
       default: false
       hidden : true
+
     - name: redisClusterPassword
       caption: Cluster Password
       type: string
       value: 
       hidden: true
 
+    - caption: First master Port Number
+      type: spinner
+      name: fm
+      increment: 1
+      default: 7000
+      min: 1
+      hidden: true
+    - caption: second master Port Number
+      type: spinner
+      name: sm
+      increment: 1
+      default: 7001
+      min: 1
+      hidden: true
+    - caption: third master Port Number
+      type: spinner
+      name: tm
+      increment: 1
+      default: 7002
+      min: 1
+      hidden: true
+    - caption: First slave Port Number
+      type: spinner
+      name: fs
+      increment: 1
+      default: 7003
+      min: 1
+      hidden: true
+    - caption: second slave Port Number
+      type: spinner
+      name: ss
+      increment: 1
+      default: 7004
+      min: 1
+      hidden: true
+    - caption: third slave Port Number
+      type: spinner
+      name: ts
+      increment: 1
+      default: 7005
+      min: 1  
+      hidden: true
+
 onInstall:
+  - if ( "${globals.pass}" == "" ):
+    setGlobals:
+      pass: ${fn.password}
+
   # Create appropriate environment with settings selected in previous screen
   - if (settings.mode == 'newEnv'):
       install:
@@ -114,9 +162,6 @@ onInstall:
             script: |               
               return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
 
-  - if ( "${globals.pass}" == "" ):
-    setGlobals:
-      pass: ${fn.password}
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install: ${baseUrl}/scripts/cluster.jps
     envName: ${settings.envName}
@@ -129,7 +174,9 @@ onInstall:
       if (resp.result != 0) return resp;
       var nodes = resp.nodes;
       return { result: 0, "nodes": nodes };
-  - log: result.nodes
+  - log: ${response.nodes}
+  - setGlobals: 
+      nodes: ${response.nodes}
   - return:
       result: success
       message: ${baseUrl}/texts/clusterSuccess.md
