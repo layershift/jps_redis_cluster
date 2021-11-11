@@ -36,8 +36,11 @@ menu :
 buttons:
 - caption: p3x-redis-ui
   action: generateURL
+  settings: showInfo
+
 
 settings:
+  main:  
     fields:
     - name: redisClusterPassword
       caption: Cluster Password
@@ -86,6 +89,17 @@ settings:
       default: 7005
       min: 1  
       hidden: true
+  showInfo:
+      fields: []
+      submitType: none
+      onBeforeInit: |
+        settings.fields.push({
+            type: 'displayfield',
+            hideLabel: true,
+            value: '[P3X Redis UI](https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/)Access details:User: developer\Password: ${globals.pass}' 
+          });
+      
+        return settings;
 
 onUninstall:
   uninstall_nginx_interface
