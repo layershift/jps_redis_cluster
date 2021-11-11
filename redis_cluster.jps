@@ -122,6 +122,13 @@ onInstall:
     pass: ${globals.pass}
     nodeGroup: redis_nodes
 
+  # pupulate the nodes variable because this JPS is not aware of it. Actual node creation is done in called JPS
+  - script: |
+      var resp = api.env.control.GetEnvInfo("${env.name}", session);
+      if (resp.result != 0) return resp;
+      var nodes = resp.nodes;
+      return { result: 0, onAfterReturn: { setGlobals: nodes } };
+
   - return:
       result: success
       message: ${baseUrl}/texts/clusterSuccess.md
