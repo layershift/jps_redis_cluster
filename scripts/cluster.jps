@@ -23,7 +23,7 @@ menu :
 
 onInstall:
 #Set ranadom password if global pass is empty
-  - if (${globals.pass} == ""):
+  - if ( "${globals.pass}" == "" ):
     setGlobals:
       pass: ${fn.password}
 # cleanup any previous cluster files

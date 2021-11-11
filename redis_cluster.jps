@@ -89,6 +89,7 @@ onInstall:
               if ( ${settings.public_ip} == true ):
                 extip: true
               skipNodeEmails: true
+              isResetServicePassword: false
               env:
                 ADMINPANEL_ENABLED: false
   #Add nodes to the Environment previously selected
@@ -104,16 +105,16 @@ onInstall:
               fixedCloudlets: 1
               flexibleCloudlets: ${settings.cldts}
               nodeGroup: redis_nodes
+              password: ${globals.pass}
               options:
                 skipNodeEmails: true
-              skipNodeEmails: true
               metadata:
                 dockerEnvVars:
                   ADMINPANEL_ENABLED: false
             script: |               
               return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
 
-  - if (${globals.pass} == ""):
+  - if ( "${globals.pass}" == "" ):
     setGlobals:
       pass: ${fn.password}
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
@@ -124,11 +125,11 @@ onInstall:
 
   # pupulate the nodes variable because this JPS is not aware of it. Actual node creation is done in called JPS
   - script: |
-      var resp = api.env.control.GetEnvInfo("${env.name}", session);
+      var resp = api.env.control.GetEnvInfo("${settings.envName}", session);
       if (resp.result != 0) return resp;
       var nodes = resp.nodes;
-      return { result: 0, onAfterReturn: { setGlobals: nodes } };
-
+      return { result: 0, "nodes": nodes };
+  - log: result.nodes
   - return:
       result: success
       message: ${baseUrl}/texts/clusterSuccess.md
