@@ -1,15 +1,15 @@
 In order to use the cluster please connect to the following nodes:
 
-${globals.nodes[0].address}:${settings.fm}\
-${globals.nodes[1].address}:${settings.sm}\
-${globals.nodes[2].address}:${settings.tm}\
-${globals.nodes[3].address}:${settings.fs}\
-${globals.nodes[4].address}:${settings.ss}\
-${globals.nodes[5].address}:${settings.ts}
+${nodes.redis_nodes[0].address}:${settings.fm}\
+${nodes.redis_nodes[1].address}:${settings.sm}\
+${nodes.redis_nodes[2].address}:${settings.tm}\
+${nodes.redis_nodes[3].address}:${settings.fs}\
+${nodes.redis_nodes[4].address}:${settings.ss}\
+${nodes.redis_nodes[5].address}:${settings.ts}
 
 Password: ${globals.pass}
 
-[P3X Redis UI](https://developer:${globals.pass}@node${globals.nodes[0].id}-${settings.envName}/connect/)
+[P3X Redis UI](https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/)\
 Access details:
 
 User: developer\
