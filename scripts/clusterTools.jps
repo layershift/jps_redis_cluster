@@ -105,10 +105,19 @@ onUninstall:
   uninstall_nginx_interface
 
 onInstall:
-  - install_nginx_interface
-  - generateURL
-
+  install
+  
 actions:
+  install:
+  #Set ranadom password if global pass is empty
+    - if ("${globals.pass}" == ""):
+        setGlobals:
+          pass: ${fn.password}
+    - install_nginx_interface
+    - amendNodeVars
+    - generateURL
+
+
   showConnectionInformation:
     return:
       result: success
@@ -179,6 +188,13 @@ actions:
             - /bin/htpasswd -b -c /etc/nginx/conf.d/.htpasswd developer ${globals.pass}
             - systemctl restart nginx
       user: root
+
+  amendNodeVars:
+    - api[redis_nodes]: env.control.ApplyNodeGroupData
+      data: 
+        isResetServicePassword: false
+        adminUrl: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
+
 
   generateURL:
     return:
