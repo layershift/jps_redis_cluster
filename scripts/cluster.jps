@@ -22,68 +22,14 @@ menu :
 
 
 onInstall:
-#Set ranadom password if global pass is empty
-  - if ( "${globals.pass}" == "" ):
-    setGlobals:
-      pass: ${fn.password}
-# cleanup any previous cluster files
-  - uninstall:
-#Open firewall ports from 7000-7005 and 17000-17005
-#These ports are only opened for the internal IP of the nodes
-  - set-firewall
-  - set-firewall-cluster
-#Create configuration files for redis cluster
-  - cmd [redis_nodes]:
-    - touch /etc/redis/ips.txt
-    - chown jelastic /etc/redis/ips.txt
-    user: root
-  - cmd [redis_nodes]:
-    - touch /etc/redis/redis_cluster.conf
-    - chown jelastic /etc/redis/redis_cluster.conf
-    user: root
-#Create unique paswword on all 6 redis nodes
-  - set_configuration :
-  - api [redis_nodes]: environment.control.RestartNodes
-#Add confifuration to the files
-  - set_port :
-  - set_port1 :
-  - set_port2 :
-  - set_port3 :
-  - set_port4 :
-  - set_port5 :
-  - config2 :
-  - config3 :
-  - config4 :
-  - config5 :
-  - config6 :
-  - config_cluster:
-      message: ${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts}
-  - config_cluster:
-      message: --cluster-replicas 1
-  - api [redis_nodes]: environment.control.RestartNodes
-#Start redis cluster with the configuration file
-  - start_redis_cluster:
-  - install: ${baseUrl}/scripts/clusterTools.jps
-    envName: ${env.envName}
-    settings:
-      redisClusterPassword: ${globals.pass}
-    nodeGroup: redis_nodes
-
-  - script: |
-      var resp = api.env.control.GetEnvInfo("${env.envName}", session);
-      if (resp.result != 0) return resp;
-      var nodes = resp.nodes;
-      return { result: 0, "nodes": nodes };
-
-  - setGlobals: 
-      nodes: ${response.nodes}
-
-  - return:
-      result: success
-      message: ${baseUrl}/texts/clusterSuccess.md
+  install:
 
 onUninstall:
   uninstall:
+
+onAfterRedeployContainer:
+  install:
+
 
 settings:
 #The port settings are hidden from the customer and are used for the correct configuration
@@ -92,7 +38,7 @@ settings:
     caption: Cluster Password
     type: string
     value: 
-    hidden: true
+
   - caption: First master Port Number
     type: spinner
     name: fm
@@ -137,6 +83,65 @@ settings:
     hidden: true
     
 actions:
+  install:
+  #Set ranadom password if global pass is empty
+    - if ( "${globals.pass}" == "" ):
+      setGlobals:
+        pass: ${fn.password}
+  # cleanup any previous cluster files
+    - uninstall:
+  #Open firewall ports from 7000-7005 and 17000-17005
+  #These ports are only opened for the internal IP of the nodes
+    - set-firewall
+    - set-firewall-cluster
+  #Create configuration files for redis cluster
+    - cmd [redis_nodes]:
+      - touch /etc/redis/ips.txt
+      - chown jelastic /etc/redis/ips.txt
+      user: root
+    - cmd [redis_nodes]:
+      - touch /etc/redis/redis_cluster.conf
+      - chown jelastic /etc/redis/redis_cluster.conf
+      user: root
+  #Create unique paswword on all 6 redis nodes
+    - set_configuration :
+    - api [redis_nodes]: environment.control.RestartNodes
+  #Add confifuration to the files
+    - set_port :
+    - set_port1 :
+    - set_port2 :
+    - set_port3 :
+    - set_port4 :
+    - set_port5 :
+    - config2 :
+    - config3 :
+    - config4 :
+    - config5 :
+    - config6 :
+    - config_cluster:
+        message: ${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts}
+    - config_cluster:
+        message: --cluster-replicas 1
+    - api [redis_nodes]: environment.control.RestartNodes
+  #Start redis cluster with the configuration file
+    - start_redis_cluster:
+    - install: ${baseUrl}/scripts/clusterTools.jps
+      envName: ${env.envName}
+      settings:
+        redisClusterPassword: ${globals.pass}
+      nodeGroup: redis_nodes
+    - script: |
+        var resp = api.env.control.GetEnvInfo("${env.envName}", session);
+        if (resp.result != 0) return resp;
+        var nodes = resp.nodes;
+        return { result: 0, "nodes": nodes };
+    - setGlobals: 
+        nodes: ${response.nodes}
+    - return:
+        result: success
+        message: ${baseUrl}/texts/clusterSuccess.md
+
+#other actions
   set_port :
     - nodeId: ${nodes.redis_nodes[0].id}
       appendFile [redis_nodes]:
@@ -209,6 +214,8 @@ actions:
       - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
       - sleep 5
     user: root
+
+
   uninstall:
     - cmd [redis_nodes] :
         - jem service stop || true
