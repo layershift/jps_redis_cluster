@@ -70,14 +70,14 @@ onInstall:
     nodeGroup: redis_nodes
 
   - script: |
-      var resp = api.env.control.GetEnvInfo("${settings.envName}", session);
+      var resp = api.env.control.GetEnvInfo("${env.envName}", session);
       if (resp.result != 0) return resp;
       var nodes = resp.nodes;
       return { result: 0, "nodes": nodes };
 
   - setGlobals: 
       nodes: ${response.nodes}
-      
+
   - return:
       result: success
       message: ${baseUrl}/texts/clusterSuccess.md
