@@ -165,7 +165,7 @@ onInstall:
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
   - install: ${baseUrl}/scripts/cluster.jps
     envName: ${settings.envName}
-    pass: ${globals.pass}
+    redisClusterPassword: ${globals.pass}
     nodeGroup: redis_nodes
 
   # pupulate the nodes variable because this JPS is not aware of it. Actual node creation is done in called JPS
