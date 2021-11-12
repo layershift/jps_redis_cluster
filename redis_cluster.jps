@@ -174,7 +174,7 @@ onInstall:
       if (resp.result != 0) return resp;
       var nodes = resp.nodes;
       return { result: 0, "nodes": nodes };
-  - log: ${response.nodes}
+
   - setGlobals: 
       nodes: ${response.nodes}
 
