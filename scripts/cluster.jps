@@ -26,14 +26,11 @@ menu :
   caption: Rebuild Cluster
   action: install
 
-onInstall:
-  install:
+onInstall: install
 
-onUninstall:
-  uninstall:
+onUninstall: uninstall
 
-onAfterRedeployContainer:
-  install:
+onAfterRedeployContainer: install
 
 
 settings:
@@ -109,15 +106,15 @@ actions:
       - chown jelastic /etc/redis/redis_cluster.conf
       user: root
   #Create unique paswword on all 6 redis nodes
-    - set_configuration :
+    - set_configuration:
   #  - api [redis_nodes]: environment.control.RestartNodes
   #Add confifuration to the files
-    - set_port :
-    - set_port1 :
-    - set_port2 :
-    - set_port3 :
-    - set_port4 :
-    - set_port5 :
+    - set_port
+    - set_port1
+    - set_port2
+    - set_port3
+    - set_port4
+    - set_port5
     - config_cluster:
         message: "${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts} --cluster-replicas 1"
     - api [redis_nodes]: environment.control.restartservices
