@@ -69,10 +69,26 @@ onInstall:
       pass: "${settings.redisClusterPassword}"
       authSecret: ${fn.password(24)}
 
+    settings:
+      credentials:
+        fields:
+          - type: string
+            caption: Login
+            readOnly: true
+            value: developer
+          
+          - type: string
+            caption: Password
+            value: ${globals.pass}
+            readOnly: true
+            
     buttons:
     - caption: p3x-redis-ui      
       href: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
-
+    
+    - caption: Show Credentials
+      settings: credentials
+      
     - menu :
       - caption: Show Cluster Nodes
         action: showClusterNodes
