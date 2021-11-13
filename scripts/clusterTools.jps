@@ -1,47 +1,13 @@
 _info : 'https://docs.cloudscripting.com/6.1.2/'
-version: 6.1.2
 type: update
 name: 'Redis Cluster Tools'
-id: 'redis_cluster_tools'
 homepage: https://github.com/layershift/jps_redis_cluster
 baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/Redis_cluster.png?_r=${fn.random}
-description:
-  short: Redis Cluster Tools.
+version: 6.1.2
 
-targetNodes:
-  nodeGroup: 'redis_nodes'
-
-globals:
-  pass: "${settings.redisClusterPassword}"
-  authSecret: ${fn.password(24)}
-
-menu :
-- caption: Show Cluster Nodes
-  action: showClusterNodes
-  confirmText: Run "cluster nodes" redis command and show the output?
-
-- caption: Show connection information
-  action: showConnectionInformation
-  confirmText: Do you wish to display the cluster connection information?
-
-- caption: Ping cluster nodes
-  action: pingClusterNodes
-  confirmText: Do you wish to run "ping" redis command on all cluster nodes?
-
-- caption: Update P3X-Redis-UI
-  action: updateP3XRedisUI
-  confirmText: Do you wish to update p3x-redis-ui application?
-
-buttons:
-- caption: p3x-redis-ui
-  action: generateURL
-  settings: showInfo
-
-
-settings:
-  main:  
-    fields:
+settings: 
+  fields:
     - name: redisClusterPassword
       caption: Cluster Password
       type: string
@@ -89,114 +55,134 @@ settings:
       default: 7005
       min: 1  
       hidden: true
-  showInfo:
-      fields: []
-      submitType: none
-      onBeforeInit: |
-        settings.fields.push({
-            type: 'displayfield',
-            hideLabel: true,
-            value: '[P3X Redis UI](https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/)Access details:User: developer\Password: ${globals.pass}' 
-          });
-      
-        return settings;
-
-onUninstall:
-  uninstall_nginx_interface
 
 onInstall:
-  install
-  
-actions:
-  install:
-  #Set ranadom password if global pass is empty
-    - if ("${globals.pass}" == ""):
-        setGlobals:
-          pass: ${fn.password}
-    - install_nginx_interface
-    - amendNodeVars
-    - generateURL
+  install [redis_nodes]:
+    type: update
+    name: 'Redis Cluster Tools'
+    id: 'redis_cluster_tools'    
+    logo: /images/Redis_cluster.png?_r=${fn.random}
+    description:
+      short: Redis Cluster Tools.
 
+    globals:
+      pass: "${settings.redisClusterPassword}"
+      authSecret: ${fn.password(24)}
 
-  showConnectionInformation:
-    return:
-      result: success
-      message: ${baseUrl}/texts/clusterToolsShowConnectionInformation.md
+    buttons:
+    - caption: p3x-redis-ui      
+      href: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
 
-  showClusterNodes:
-    - cmd[${nodes.redis_nodes[0].id}]:
-        - redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes 2>/dev/null | awk '{printf "%25-s %s %s\n" ,$2,$3,$8}'
-      user: root
-    - message: ${response.out}
-      script: |
-        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
-  
-  pingClusterNodes:
-    - cmd[${nodes.redis_nodes[0].id}]:
-        - for node in $(redis-cli -p 7000 -a ${globals.pass} cluster nodes 2>/dev/null | awk '{print $2}' | awk -F "@" '{print $1}'); do redis-cli $(echo $node| awk -F":" '{print "-h "$1" -p "$2}') -a ${globals.pass} ping 2>/dev/null | awk '{print "'$node' "$0}'; done | awk '{printf "%-20s %s\n",$1,$2}'
-      user: root
-    - message: ${response.out}
-      script: |
-        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
-  
-  updateP3XRedisUI:
-    - cmd[${nodes.redis_nodes[0].id}]:
-        - npm update -g p3x-redis-ui
-      user: root
-    - message: ${response.out}
-      script: |
-        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+    - menu :
+      - caption: Show Cluster Nodes
+        action: showClusterNodes
+        confirmText: Run "cluster nodes" redis command and show the output?
 
-  uninstall_nginx_interface:
-    - cmd [${nodes.redis_nodes[0].id}]:
-          - systemctl disable --now nginx p3x-redis-ui
-          - npm uninstall -g p3x-redis-ui
-          - yum remove nginx nodejs httpd-tools -y
-          - userdel -f p3x-redis-ui
-      user: root
+      - caption: Show connection information
+        action: showConnectionInformation
+        confirmText: Do you wish to display the cluster connection information?
 
-  install_nginx_interface:
-    - cmd [${nodes.redis_nodes[0].id}]: 
-            - curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
-            - yum clean all
-            - rm -rf /var/cache/yum/*
-            - yum install epel-release -y
-            - yum install nginx nodejs httpd-tools -y
-            - systemctl enable --now nginx
-            - npm install -g p3x-redis-ui
+      - caption: Ping cluster nodes
+        action: pingClusterNodes
+        confirmText: Do you wish to run "ping" redis command on all cluster nodes?
+
+      - caption: Update P3X-Redis-UI
+        action: updateP3XRedisUI
+        confirmText: Do you wish to update p3x-redis-ui application?
+
+    onUninstall: uninstall_nginx_interface
+
+    onInstall:
+    - installClusterTools
+    - return:
+        result: success
+        message: ${baseUrl}/texts/clusterToolsGenerateURL.md
+
+    actions:
+      installClusterTools:
+      #Set ranadom password if global pass is empty
+        - if ("${globals.pass}" == ""):
+            setGlobals:
+              pass: ${fn.password}
+        - install_nginx_interface
+        - amendNodeVars
+
+      showConnectionInformation:
+        return:
+          result: success
+          message: ${baseUrl}/texts/clusterToolsShowConnectionInformation.md
+
+      showClusterNodes:
+        - cmd[${nodes.redis_nodes[0].id}]: |-
+            redis-cli -p ${settings.fm} -a ${globals.pass} cluster nodes 2>/dev/null | awk '{printf "%25-s %s %s\n" ,$2,$3,$8}'
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
+      pingClusterNodes:
+        - cmd[${nodes.redis_nodes[0].id}]:
+            for node in $(redis-cli -p 7000 -a ${globals.pass} cluster nodes 2>/dev/null | awk '{print $2}' | awk -F "@" '{print $1}'); do redis-cli $(echo $node| awk -F":" '{print "-h "$1" -p "$2}') -a ${globals.pass} ping 2>/dev/null | awk '{print "'$node' "$0}'; done | awk '{printf "%-20s %s\n",$1,$2}'
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
+      updateP3XRedisUI:
+        - cmd[${nodes.redis_nodes[0].id}]:
+            - npm update -g p3x-redis-ui
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
+      uninstall_nginx_interface:
+        - cmd [${nodes.redis_nodes[0].id}]: |-
+            systemctl disable --now nginx p3x-redis-ui
+            npm uninstall -g p3x-redis-ui
+            yum remove nginx nodejs httpd-tools -y
+            userdel -f p3x-redis-ui
+          user: root
+
+      install_nginx_interface:
+        - cmd [${nodes.redis_nodes[0].id}]: |-
+            curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+            yum clean all
+            rm -rf /var/cache/yum/*
+            yum install epel-release -y
+            yum install nginx nodejs httpd-tools -y
+            systemctl enable --now nginx
+            npm install -g p3x-redis-ui
+            
             #Configure p3x-redis-ui  as described https://github.com/patrikx3/redis-ui/blob/HEAD/artifacts/readme/start-up-server.md
-            - useradd --gid 700 --no-user-group --create-home --non-unique --uid 700 -s /sbin/nologin p3x-redis-ui
-            - curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.service' -o /etc/systemd/system/p3x-redis-ui.service;
-            - systemctl daemon-reload
-            - systemctl enable p3x-redis-ui
-            - curl -fsSL '${baseUrl}/scripts/p3xrs.json' -o /home/p3x-redis-ui/p3xrs.json;
-            - curl -fsSL '${baseUrl}/scripts/p3xrs-conns.json' -o /home/p3x-redis-ui/.p3xrs-conns.json;
-            - chown redis:redis /home/p3x-redis-ui/p3xrs.json /home/p3x-redis-ui/.p3xrs-conns.json;
-            - sed "s#__replace_me_date__#$(date +%FT%T.%3NZ)#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            - sed "s#__replace_me_name__#${nodes.redis_nodes[0].address}:${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            - sed "s#__replace_me_host__#${nodes.redis_nodes[0].address}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            - sed "s#\"__replace_me_port__\"#${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            - sed "s#__replace_me_password__#${globals.pass}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            - service p3x-redis-ui start
+            useradd --gid 700 --no-user-group --create-home --non-unique --uid 700 -s /sbin/nologin p3x-redis-ui
+            curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.service' -o /etc/systemd/system/p3x-redis-ui.service;
+            systemctl daemon-reload
+            systemctl enable p3x-redis-ui
+            curl -fsSL '${baseUrl}/scripts/p3xrs.json' -o /home/p3x-redis-ui/p3xrs.json;
+            curl -fsSL '${baseUrl}/scripts/p3xrs-conns.json' -o /home/p3x-redis-ui/.p3xrs-conns.json;
+            chown redis:redis /home/p3x-redis-ui/p3xrs.json /home/p3x-redis-ui/.p3xrs-conns.json;
+            sed "s#__replace_me_date__#$(date +%FT%T.%3NZ)#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            sed "s#__replace_me_name__#${nodes.redis_nodes[0].address}:${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            sed "s#__replace_me_host__#${nodes.redis_nodes[0].address}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            sed "s#\"__replace_me_port__\"#${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            sed "s#__replace_me_password__#${globals.pass}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
+            service p3x-redis-ui start
+            
             #configure nginx to redirect to p3x-redis-ui localhost 7843 as described https://github.com/patrikx3/redis-ui/blob/HEAD/artifacts/readme/start-up-server.md
-            - curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.conf' -o /etc/nginx/default.d/p3x-redis-ui.conf;
-            - curl -fsSL '${baseUrl}/scripts/p3x-redis-ui-login-map.conf' -o /etc/nginx/conf.d/p3x-redis-ui-login-map.conf;
-            - sed "s#__replace_login_protect__#${globals.authSecret}#g" -i /etc/nginx/default.d/p3x-redis-ui.conf;
-            - sed "s#__replace_login_protect__#${globals.authSecret}#g" -i /etc/nginx/conf.d/p3x-redis-ui-login-map.conf;
+            curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.conf' -o /etc/nginx/default.d/p3x-redis-ui.conf;
+            curl -fsSL '${baseUrl}/scripts/p3x-redis-ui-login-map.conf' -o /etc/nginx/conf.d/p3x-redis-ui-login-map.conf;
+            sed "s#__replace_login_protect__#${globals.authSecret}#g" -i /etc/nginx/default.d/p3x-redis-ui.conf;
+            sed "s#__replace_login_protect__#${globals.authSecret}#g" -i /etc/nginx/conf.d/p3x-redis-ui-login-map.conf;
             #password protect nginx  described https://ubiq.co/tech-blog/how-to-password-protect-directory-in-nginx/
-            - if [ -f /etc/nginx/conf.d/.htpasswd ]; then rm -rf /etc/nginx/conf.d/.htpasswd; fi 
-            - /bin/htpasswd -b -c /etc/nginx/conf.d/.htpasswd developer ${globals.pass}
-            - systemctl restart nginx
-      user: root
+            if [ -f /etc/nginx/conf.d/.htpasswd ]; then rm -rf /etc/nginx/conf.d/.htpasswd; fi 
+            /bin/htpasswd -b -c /etc/nginx/conf.d/.htpasswd developer ${globals.pass}
+            systemctl restart nginx
+          user: root
 
-  amendNodeVars:
-    - api[redis_nodes]: env.control.ApplyNodeGroupData
-      data: 
-        isResetServicePassword: false
-        adminUrl: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
+      amendNodeVars:
+        - env.control.ApplyNodeGroupData [redis_nodes]
+            data: 
+              isResetServicePassword: false
+              adminUrl: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
 
-
-  generateURL:
-    return:
-      result: success
-      message: ${baseUrl}/texts/clusterToolsGenerateURL.md
