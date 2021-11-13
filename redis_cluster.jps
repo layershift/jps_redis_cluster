@@ -170,7 +170,7 @@ onInstall:
 
   # pupulate the nodes variable because this JPS is not aware of it. Actual node creation is done in called JPS
   - initNodes:
-      envName: ${this.envName}
+      envName: ${settings.envName}
       namespace: nodes      
 
   - env.control.ApplyNodeGroupData [redis_nodes]:
