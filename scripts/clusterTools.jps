@@ -181,7 +181,7 @@ onInstall:
           user: root
 
       amendNodeVars:
-        - env.control.ApplyNodeGroupData [redis_nodes]
+        - env.control.ApplyNodeGroupData [redis_nodes]:
             data: 
               isResetServicePassword: false
               adminUrl: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
