@@ -121,8 +121,7 @@ actions:
   #Start redis cluster with the configuration file
     - start_redis_cluster:
     - install: ${baseUrl}/scripts/clusterTools.jps
-      envName: ${env.envName}
-      nodeGroup: redis_nodes
+      envName: ${env.envName}      
       settings:
         redisClusterPassword: ${globals.pass}
     - return:
