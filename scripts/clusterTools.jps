@@ -79,12 +79,12 @@ onInstall:
           
           - type: string
             caption: Password
-            value: ${globals.pass}
+            value: ${settings.redisClusterPassword}
             readOnly: true
             
     buttons:
     - caption: p3x-redis-ui      
-      href: https://developer:${globals.pass}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
+      href: https://developer:${settings.redisClusterPassword}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
     
     - caption: Show Credentials
       settings: credentials
