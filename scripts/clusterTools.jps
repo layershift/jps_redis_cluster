@@ -71,6 +71,7 @@ onInstall:
 
     settings:
       credentials:
+        submitType: none
         fields:
           - type: string
             caption: Login
