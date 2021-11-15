@@ -182,6 +182,8 @@ onInstall:
         isResetServicePassword: false
         adminUrl: https://developer:${globals.pass}@node${globals.nodes.redis_nodes[0].id}-${globals.env.domain}/connect/
 
+success: texts/success.md
+
 actions:
   initGlobals:
     envName: ${this.envName}
@@ -201,7 +203,6 @@ actions:
       let globals = {}
       globals[namespaceNodes] = nodes
       globals[namespaceEnv] = resp.env
+      globals['settings'] = ${settings}
 
       return { result: 0, onAfterReturn: { setGlobals: globals } }
-
-success: texts/success.md
