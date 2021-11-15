@@ -4,7 +4,7 @@ type: update
 name: 'Redis Cluster'
 id: 'redis_cluster'
 homepage: https://github.com/layershift/jps_redis_cluster
-baseUrl: https://raw.githubusercontent.com/SlavaKatiukha/jps_redis_cluster/main
+baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main
 logo: /images/Redis_cluster.png?_r=${fn.random}
 description:
   short: Redis Cluster is configured.
