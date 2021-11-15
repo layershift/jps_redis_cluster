@@ -15,16 +15,17 @@ targetNodes:
 globals:
   pass: ${settings.redisClusterPassword}
 
-menu :
-- confirmText: Do you want to see the cluster password?
-  caption: Show Cluster Password
-  action: showClusterPassword
+buttons:
+- menu :
+  - confirmText: Do you want to see the cluster password?
+    caption: Show Cluster Password
+    action: showClusterPassword
 
-- confirmText: |
-    Do you want to reinstall the cluster?
-    All data stored in the cluster will be lost!
-  caption: Rebuild Cluster
-  action: install
+  - confirmText: |
+      Do you want to reinstall the cluster?
+      All data stored in the cluster will be lost!
+    caption: Rebuild Cluster
+    action: install
 
 onInstall: install
 
