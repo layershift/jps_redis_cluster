@@ -163,10 +163,12 @@ onInstall:
               return { result: 0, onAfterReturn: { 'env.control.AddNode': Array(${settings.redis_nodes}).fill(JSON.parse(node)) } }
 
   # Once the nodes are added, it will install the Redis_ckuster package that configures the 6 Redis nodes into a cluster
-  - install: ${baseUrl}/scripts/cluster.jps
-    envName: ${settings.envName}
-    redisClusterPassword: ${globals.pass}
-    nodeGroup: redis_nodes
+  - install: 
+      jps: ${baseUrl}/scripts/cluster.jps
+      envName: ${settings.envName}
+      nodeGroup: redis_nodes
+      settings:
+        redisClusterPassword: ${globals.pass}      
 
   # pupulate the nodes variable because this JPS is not aware of it. Actual node creation is done in called JPS
   - initGlobals:
