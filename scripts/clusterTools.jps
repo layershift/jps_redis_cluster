@@ -13,48 +13,6 @@ settings:
       type: string
       value: 
 
-    - caption: First master Port Number
-      type: spinner
-      name: fm
-      increment: 1
-      default: 7000
-      min: 1
-      hidden: true
-    - caption: second master Port Number
-      type: spinner
-      name: sm
-      increment: 1
-      default: 7001
-      min: 1
-      hidden: true
-    - caption: third master Port Number
-      type: spinner
-      name: tm
-      increment: 1
-      default: 7002
-      min: 1
-      hidden: true
-    - caption: First slave Port Number
-      type: spinner
-      name: fs
-      increment: 1
-      default: 7003
-      min: 1
-      hidden: true
-    - caption: second slave Port Number
-      type: spinner
-      name: ss
-      increment: 1
-      default: 7004
-      min: 1
-      hidden: true
-    - caption: third slave Port Number
-      type: spinner
-      name: ts
-      increment: 1
-      default: 7005
-      min: 1  
-      hidden: true
 
 onInstall:
   install [redis_nodes]:
@@ -68,7 +26,53 @@ onInstall:
     globals:
       pass: "${settings.redisClusterPassword}"
       authSecret: ${fn.password(24)}
-            
+
+    settings: 
+      fields:
+      - caption: First master Port Number
+        type: spinner
+        name: fm
+        increment: 1
+        default: 7000
+        min: 1
+        hidden: true
+      - caption: second master Port Number
+        type: spinner
+        name: sm
+        increment: 1
+        default: 7001
+        min: 1
+        hidden: true
+      - caption: third master Port Number
+        type: spinner
+        name: tm
+        increment: 1
+        default: 7002
+        min: 1
+        hidden: true
+      - caption: First slave Port Number
+        type: spinner
+        name: fs
+        increment: 1
+        default: 7003
+        min: 1
+        hidden: true
+      - caption: second slave Port Number
+        type: spinner
+        name: ss
+        increment: 1
+        default: 7004
+        min: 1
+        hidden: true
+      - caption: third slave Port Number
+        type: spinner
+        name: ts
+        increment: 1
+        default: 7005
+        min: 1  
+        hidden: true
+
+
     buttons:
     - caption: p3x-redis-ui      
       href: https://developer:${settings.redisClusterPassword}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
