@@ -21,78 +21,95 @@ buttons:
     caption: Show Cluster Password
     action: showClusterPassword
 
+  - confirmText: Do you want to change the cluster password? The cluster will be offline during the password change!
+    caption: Change Cluster Password
+    action: changeClusterPassword
+    settings: main
+
   - confirmText: |
       Do you want to reinstall the cluster?
       All data stored in the cluster will be lost!
     caption: Rebuild Cluster
-    action: install
+    action: doInstall
 
-onInstall: install
+onInstall: doInstall
 
-onUninstall: uninstall
+#onUninstall: uninstall
 
-onAfterRedeployContainer: install
+onAfterRedeployContainer: doInstall
 
 
 settings:
 #The port settings are hidden from the customer and are used for the correct configuration
-  fields:
-  - name: redisClusterPassword
-    caption: Cluster Password
-    type: string
-    value: 
+  main:
+    fields:
+    - name: redisClusterPassword
+      caption: Cluster Password
+      type: string
+      value: 
 
-  - caption: First master Port Number
-    type: spinner
-    name: fm
-    increment: 1
-    default: 7000
-    min: 1
-    hidden: true
-  - caption: second master Port Number
-    type: spinner
-    name: sm
-    increment: 1
-    default: 7001
-    min: 1
-    hidden: true
-  - caption: third master Port Number
-    type: spinner
-    name: tm
-    increment: 1
-    default: 7002
-    min: 1
-    hidden: true
-  - caption: First slave Port Number
-    type: spinner
-    name: fs
-    increment: 1
-    default: 7003
-    min: 1
-    hidden: true
-  - caption: second slave Port Number
-    type: spinner
-    name: ss
-    increment: 1
-    default: 7004
-    min: 1
-    hidden: true
-  - caption: third slave Port Number
-    type: spinner
-    name: ts
-    increment: 1
-    default: 7005
-    min: 1  
-    hidden: true
+    - caption: First master Port Number
+      type: spinner
+      name: fm
+      increment: 1
+      default: 7000
+      min: 1
+      hidden: true
+    - caption: second master Port Number
+      type: spinner
+      name: sm
+      increment: 1
+      default: 7001
+      min: 1
+      hidden: true
+    - caption: third master Port Number
+      type: spinner
+      name: tm
+      increment: 1
+      default: 7002
+      min: 1
+      hidden: true
+    - caption: First slave Port Number
+      type: spinner
+      name: fs
+      increment: 1
+      default: 7003
+      min: 1
+      hidden: true
+    - caption: second slave Port Number
+      type: spinner
+      name: ss
+      increment: 1
+      default: 7004
+      min: 1
+      hidden: true
+    - caption: third slave Port Number
+      type: spinner
+      name: ts
+      increment: 1
+      default: 7005
+      min: 1  
+      hidden: true
+  chnageClusterPassword:
+    fields:
+    - caption: |
+        Please set the new cluster password.
+        Data will not be lost during this process but the cluster will be offline.
+      type: displayfield
+    - name: redisClusterPassword
+      caption: New Cluster Password
+      type: string
+      value: 
+      required: true
     
 actions:
-  install:
+  doInstall:
   #Set ranadom password if global pass is empty
     - if ("${globals.pass}" == ""):
         setGlobals:
           pass: ${fn.password}
   # cleanup any previous cluster files
-    - uninstall:
+    - doUninstall:
   #Open firewall ports from 7000-7005 and 17000-17005
   #These ports are only opened for the internal IP of the nodes
     - set-firewall
@@ -121,10 +138,9 @@ actions:
     - api [redis_nodes]: environment.control.restartservices
   #Start redis cluster with the configuration file
     - start_redis_cluster:
-    - install: ${baseUrl}/scripts/clusterTools.jps
-      envName: ${env.envName}      
-      settings:
-        redisClusterPassword: ${globals.pass}
+
+    - installClusterTools:
+
     - return:
         result: success
         message: ${baseUrl}/texts/clusterSuccess.md
@@ -184,7 +200,7 @@ actions:
       user: root
 
 
-  uninstall:
+  doUninstall:
     - cmd [redis_nodes] :
         - jem service stop || true
         - rm -f /etc/redis/ips.txt
@@ -206,7 +222,7 @@ actions:
         }
         return { 'result': 0 };
 
-  set-firewall :
+  set-firewall:
     api[redis_nodes]:
       - method: environment.security.addrule
         params:
@@ -217,7 +233,7 @@ actions:
           src: "ALL",
           ports: "7000-7005"
           }
-  set-firewall-cluster :
+  set-firewall-cluster:
       api[redis_nodes]:
         - method: environment.security.addrule
           params:
@@ -229,7 +245,40 @@ actions:
               ports: "17000-17005"
               }
   
-  showClusterPassword : 
+  showClusterPassword: 
     - message: "Cluster password is ${globals.pass}"
       script: |
         return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+  
+  installClusterTools:
+    - install: 
+        jps: ${baseUrl}/scripts/clusterTools.jps
+        envName: ${env.envName}      
+        settings:
+          redisClusterPassword: ${globals.pass}
+
+  changeClusterPassword:
+    - log: |
+        ${globals.print()}
+
+    - if ("${settings.redisClusterPassword}" == ""):
+        setGlobals:
+          pass: ${fn.password}
+    - else:
+        setGlobals:
+          pass: ${settings.redisClusterPassword}
+
+    - cmd[redis_nodes]:
+        - jem service stop
+        - sed "s#requirepass.*#requirepass ${globals.pass}#g" -i /etc/redis.conf
+        - sed "s#masterauth.*#masterauth ${globals.pass}#g" -i /etc/redis/redis_cluster.conf
+        - jem service start
+      user: root
+    - installClusterTools:
+
+    - log: |
+        ${globals.print()}
+
+    - return:
+        result: success
+        message: ${baseUrl}/texts/clusterSuccess.md
