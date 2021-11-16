@@ -18,7 +18,8 @@ onInstall:
   install [redis_nodes]:
     type: update
     name: 'Redis Cluster Tools'
-    id: 'redis_cluster_tools'    
+    id: 'redis_cluster_tools'
+    baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main 
     logo: /images/Redis_cluster.png?_r=${fn.random}
     description:
       short: Redis Cluster Tools.
