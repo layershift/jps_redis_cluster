@@ -25,20 +25,25 @@ Redis Cluster also provides some degree of availability during partitions, that 
 
 
 During installation you are asked to select if you would like to create a new environment for the Redis cluster, or configure it on an existing environemnt (if selecting an existing evironment, please make sure there are no redis nodes already added):
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/starting_page.PNG)
 
 
 Once the add-on is installed, it will create 6 Redis nodes, and configure them into a cluster.
 All the needed information regarding conectivity is displayed on the screen, and also emailed to you!
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/info.PNG)
 
 
 ### Redis Cluster 
 The Redis Cluster add-on can be found in the add-ons tab of the environment
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/cluster-addon.PNG)
 
 The available options are described below:
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/cluster-options.PNG)
+
 -   Show Cluster Password -> Will liste the current Redis Cluster password
 -   Change Cluster Password -> Will reset the existing Cluster password (This will also provide you with all the new details needed to connect to the cluster)
 -   Install Cluster Tools -> Install the Redis Cluster Tools add-on
@@ -46,9 +51,11 @@ The available options are described below:
 ### Redis Cluster Tools
 
 The redis cluster tools add-on can be found in the add-ons tab of the environment
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/add-ons.PNG)
 
 The options available here are described bellow:
+
 ![alt text](https://github.com/layershift/jps_redis_cluster/blob/main/images/cluster-tools.PNG)
 
 -   p3x-redis-ui -> Will open a new tab and allow you to connect to the P3X Redis Cluster User Interface
