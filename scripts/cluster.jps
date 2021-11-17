@@ -26,6 +26,11 @@ buttons:
     action: changeClusterPassword
     settings: main
 
+  - confirmText: Do you want to (re)install Cluster Tools?
+    caption: Install ClusterTools
+    action: installClusterTools
+    successText: Cluster Tools was successfully installed. Please check the add-on for more actions.
+
   - confirmText: |
       Do you want to reinstall the cluster?
       All data stored in the cluster will be lost!
@@ -90,17 +95,6 @@ settings:
       default: 7005
       min: 1  
       hidden: true
-  chnageClusterPassword:
-    fields:
-    - caption: |
-        Please set the new cluster password.
-        Data will not be lost during this process but the cluster will be offline.
-      type: displayfield
-    - name: redisClusterPassword
-      caption: New Cluster Password
-      type: string
-      value: 
-      required: true
     
 actions:
   doInstall:
@@ -246,7 +240,7 @@ actions:
               }
   
   showClusterPassword: 
-    - message: "Cluster password is ${globals.pass}"
+    - message: "Cluster password is ${settings.redisClusterPassword:[globals.pass]}"
       script: |
         return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
   
