@@ -20,28 +20,45 @@ buttons:
   - confirmText: Do you want to see the cluster password?
     caption: Show Cluster Password
     action: showClusterPassword
+    loadingText: Checking...
 
   - confirmText: Do you want to change the cluster password? The cluster will be offline during the password change!
     caption: Change Cluster Password
     action: changeClusterPassword
     settings: main
+    loadingText: Applying...
 
   - confirmText: Do you want to (re)install Cluster Tools?
     caption: Install ClusterTools
     action: installClusterTools
     successText: Cluster Tools was successfully installed. Please check the add-on for more actions.
+    loadingText: Installing...
 
   - confirmText: |
       Do you want to reinstall the cluster?
       All data stored in the cluster will be lost!
     caption: Rebuild Cluster
     action: doInstall
+    loadingText: Installing...
 
 onInstall: doInstall
 
 #onUninstall: uninstall
 
 onAfterRedeployContainer: doInstall
+
+onAfterClone: doInstall
+
+onBeforeAddNode[redis_nodes]:
+  stopEvent:
+    type: warning
+    message: Redis Cluster does not support scaling!
+
+onBeforeRemoveNode[redis_nodes]:
+  stopEvent:
+    type: warning
+    message: Redis Cluster does not support scaling!
+
 
 
 settings:
@@ -252,9 +269,6 @@ actions:
           redisClusterPassword: ${globals.pass}
 
   changeClusterPassword:
-    - log: |
-        ${globals.print()}
-
     - if ("${settings.redisClusterPassword}" == ""):
         setGlobals:
           pass: ${fn.password}
@@ -269,9 +283,6 @@ actions:
         - jem service start
       user: root
     - installClusterTools:
-
-    - log: |
-        ${globals.print()}
 
     - return:
         result: success
