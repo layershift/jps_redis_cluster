@@ -79,11 +79,6 @@ onInstall:
       href: https://developer:${settings.redisClusterPassword}@node${nodes.redis_nodes[0].id}-${env.domain}/connect/
     
     - menu :
-      - confirmText: Do you want to see the cluster password?
-        caption: Show Cluster Password
-        action: showClusterPassword
-        loadingText: Checking...
-
       - caption: Show Cluster Nodes
         action: showClusterNodes
         confirmText: Run "cluster nodes" redis command and show the output?
@@ -116,7 +111,7 @@ onInstall:
 
       - caption: Update P3X-Redis-UI
         action: updateP3XRedisUI
-        confirmText: Do you wish to update p3x-redis-ui application? This action will pull the latest version from the application from the public repository. This action can't be undone!
+        confirmText: This action will pull the latest version of p3x-redis-ui from the public repository. Continue?
         loadingText: Applying...
 
     onUninstall: uninstall_nginx_interface
@@ -135,11 +130,6 @@ onInstall:
               pass: ${fn.password}
         - install_nginx_interface
         - amendNodeVars
-
-      showClusterPassword: 
-        message: "Cluster password is ${settings.redisClusterPassword}"
-        script: |
-          return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
 
       showConnectionInformation:
         return:

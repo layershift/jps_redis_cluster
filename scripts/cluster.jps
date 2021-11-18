@@ -17,7 +17,12 @@ globals:
 
 buttons:
 - menu :
-  - confirmText: Do you want to change the cluster password? The cluster will be offline during the password change!
+  - confirmText: Do you want to see the cluster password?
+    caption: Show Cluster Password
+    action: showClusterPassword
+    loadingText: Checking...
+
+  - confirmText: Do you want to change the cluster password? The cluster will be offline during the password change! You also need to re)install Cluster Tools manually!
     caption: Change Cluster Password
     action: changeClusterPassword
     settings: main
@@ -107,7 +112,7 @@ settings:
       default: 7005
       min: 1  
       hidden: true
-    
+
 actions:
   doInstall:
   #Set ranadom password if global pass is empty
@@ -258,6 +263,11 @@ actions:
         settings:
           redisClusterPassword: ${globals.pass}
 
+  showClusterPassword: 
+    message: "Cluster password is ${settings.redisClusterPassword}"
+    script: |
+      return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+
   changeClusterPassword:
     - if ("${settings.redisClusterPassword}" == ""):
         setGlobals:
@@ -272,8 +282,8 @@ actions:
         - sed "s#masterauth.*#masterauth ${globals.pass}#g" -i /etc/redis/redis_cluster.conf
         - jem service start
       user: root
-    - installClusterTools:
 
     - return:
         result: success
         message: ${baseUrl}/texts/clusterSuccess.md
+
