@@ -17,11 +17,6 @@ globals:
 
 buttons:
 - menu :
-  - confirmText: Do you want to see the cluster password?
-    caption: Show Cluster Password
-    action: showClusterPassword
-    loadingText: Checking...
-
   - confirmText: Do you want to change the cluster password? The cluster will be offline during the password change!
     caption: Change Cluster Password
     action: changeClusterPassword
@@ -255,12 +250,7 @@ actions:
               src: "${nodes.redis_nodes[0].address},${nodes.redis_nodes[1].address},${nodes.redis_nodes[2].address},${nodes.redis_nodes[3].address},${nodes.redis_nodes[4].address},${nodes.redis_nodes[5].address}",
               ports: "17000-17005"
               }
-  
-  showClusterPassword: 
-    - message: "Cluster password is ${settings.redisClusterPassword}"
-      script: |
-        return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
-  
+    
   installClusterTools:
     - install: 
         jps: ${baseUrl}/scripts/clusterTools.jps
