@@ -257,7 +257,7 @@ actions:
               }
   
   showClusterPassword: 
-    - message: "Cluster password is ${settings.redisClusterPassword:[globals.pass]}"
+    - message: "Cluster password is ${settings.redisClusterPassword}"
       script: |
         return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
   
