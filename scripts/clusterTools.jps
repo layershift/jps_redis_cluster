@@ -99,9 +99,24 @@ onInstall:
         confirmText: Do you wish to run "ping" redis command on all cluster nodes?
         loadingText: Checking...
 
+      - caption: P3X-Redis-UI status
+        action: checkP3XRedisUI
+        confirmText: Do you wish to check p3x-redis-ui services status?
+        loadingText: Checking...
+
+      - caption: P3X-Redis-UI restart
+        action: restartP3XRedisUI
+        confirmText: Do you wish to restart p3x-redis-ui services?
+        loadingText: Applying...
+
+      - caption: P3X-Redis-UI stop
+        action: stopP3XRedisUI
+        confirmText: Do you wish to stop and disable p3x-redis-ui services?
+        loadingText: Applying...
+
       - caption: Update P3X-Redis-UI
         action: updateP3XRedisUI
-        confirmText: Do you wish to update p3x-redis-ui application?
+        confirmText: Do you wish to update p3x-redis-ui application? This action will pull the latest version from the application from the public repository. This action can't be undone!
         loadingText: Applying...
 
     onUninstall: uninstall_nginx_interface
@@ -147,13 +162,43 @@ onInstall:
           script: |
             return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
 
-      updateP3XRedisUI:
+      checkP3XRedisUI:
         - cmd[${nodes.redis_nodes[0].id}]:
-            - npm update -g p3x-redis-ui
+            - systemctl status p3x-redis-ui nginx --lines=0 | egrep -v "Loaded|Process|Main PID|CGroup"
           user: root
         - message: ${response.out}
           script: |
-            return {'result': 'success', 'message': message.replace(/\n/g, '  \n')}
+            return {'result': 'info', 'message': message.replace(/\n/g, '  \n')}
+
+      restartP3XRedisUI:
+        - cmd[${nodes.redis_nodes[0].id}]:
+            - systemctl enable p3x-redis-ui nginx
+            - systemctl restart p3x-redis-ui nginx
+            - systemctl status p3x-redis-ui nginx --lines=0 | egrep -v "Loaded|Process|Main PID|CGroup"
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'info', 'message': message.replace(/\n/g, '  \n')}
+
+      stopP3XRedisUI:
+        - cmd[${nodes.redis_nodes[0].id}]:
+            - systemctl stop p3x-redis-ui nginx
+            - systemctl disable p3x-redis-ui nginx
+            - systemctl status p3x-redis-ui nginx --lines=0 | egrep -v "Loaded|Process|Main PID|CGroup"
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'info', 'message': message.replace(/\n/g, '  \n')}
+
+
+      updateP3XRedisUI:
+        - cmd[${nodes.redis_nodes[0].id}]:
+            - npm update -g p3x-redis-ui
+            - systemctl restart p3x-redis-ui
+          user: root
+        - message: ${response.out}
+          script: |
+            return {'result': 'info', 'message': message.replace(/\n/g, '  \n')}
 
       uninstall_nginx_interface:
         - cmd [${nodes.redis_nodes[0].id}]: |-
@@ -186,7 +231,7 @@ onInstall:
             sed "s#__replace_me_host__#${nodes.redis_nodes[0].address}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
             sed "s#\"__replace_me_port__\"#${settings.fm}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
             sed "s#__replace_me_password__#${globals.pass}#" -i /home/p3x-redis-ui/.p3xrs-conns.json;
-            service p3x-redis-ui start
+            systemctl start p3x-redis-ui
             
             #configure nginx to redirect to p3x-redis-ui localhost 7843 as described https://github.com/patrikx3/redis-ui/blob/HEAD/artifacts/readme/start-up-server.md
             curl -fsSL '${baseUrl}/scripts/p3x-redis-ui.conf' -o /etc/nginx/default.d/p3x-redis-ui.conf;
