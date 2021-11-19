@@ -22,7 +22,9 @@ onInstall:
     baseUrl: https://raw.githubusercontent.com/layershift/jps_redis_cluster/main 
     logo: /images/Redis_cluster.png?_r=${fn.random}
     description:
-      short: Redis Cluster Tools.
+      short: |
+               Redis Cluster Tools.
+               version 18/11/2021
 
     globals:
       pass: "${settings.redisClusterPassword}"

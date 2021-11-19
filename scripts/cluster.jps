@@ -26,7 +26,9 @@ buttons:
     caption: Change Cluster Password
     action: changeClusterPassword
     settings: main
+    successText: The cluster password was successfully changed!
     loadingText: Applying...
+    
 
   - confirmText: Do you want to (re)install Cluster Tools?
     caption: Install ClusterTools
@@ -122,36 +124,19 @@ actions:
   # cleanup any previous cluster files
     - doUninstall:
   #Open firewall ports from 7000-7005 and 17000-17005
-  #These ports are only opened for the internal IP of the nodes
-    - set-firewall
-    - set-firewall-cluster
-  #Create configuration files for redis cluster
-    - cmd [redis_nodes]:
-      - touch /etc/redis/ips.txt
-      - chown jelastic /etc/redis/ips.txt
-      user: root
-    - cmd [redis_nodes]:
-      - touch /etc/redis/redis_cluster.conf
-      - chown jelastic /etc/redis/redis_cluster.conf
-      user: root
+    - set-firewall:
+    - set-firewall-cluster:
   #Create unique paswword on all 6 redis nodes
     - set_configuration:
-  #  - api [redis_nodes]: environment.control.RestartNodes
-  #Add confifuration to the files
-    - set_port
-    - set_port1
-    - set_port2
-    - set_port3
-    - set_port4
-    - set_port5
+  # create the node list for cluster start
     - config_cluster:
         message: "${nodes.redis_nodes[0].address}:${settings.fm} ${nodes.redis_nodes[1].address}:${settings.sm} ${nodes.redis_nodes[2].address}:${settings.tm} ${nodes.redis_nodes[3].address}:${settings.fs} ${nodes.redis_nodes[4].address}:${settings.ss} ${nodes.redis_nodes[5].address}:${settings.ts} --cluster-replicas 1"
     - api [redis_nodes]: environment.control.restartservices
   #Start redis cluster with the configuration file
     - start_redis_cluster:
-
+  # install clusterTools add-on
     - installClusterTools:
-
+  # success message
     - return:
         result: success
         message: ${baseUrl}/texts/clusterSuccess.md
@@ -209,13 +194,21 @@ actions:
         - /bin/echo "include /etc/redis/redis_cluster.conf" >> /etc/redis.conf
         - sleep 5
       user: root
-
+      #Add port numbers for each cluster node in /etc/redis/redis_cluster.conf
+    - set_port:
+    - set_port1:
+    - set_port2:
+    - set_port3:
+    - set_port4:
+    - set_port5:
 
   doUninstall:
     - cmd [redis_nodes] :
         - jem service stop || true
         - rm -f /etc/redis/ips.txt
+        - touch /etc/redis/ips.txt
         - echo "" > /etc/redis/redis_cluster.conf
+        - chown jelastic /etc/redis/redis_cluster.conf /etc/redis/ips.txt
         - rm -f /var/lib/redis/nodes.conf
         - rm -f /var/lib/redis/appendonly.aof
         - rm -f /var/lib/redis/dump.rdb
@@ -282,8 +275,6 @@ actions:
         - sed "s#masterauth.*#masterauth ${globals.pass}#g" -i /etc/redis/redis_cluster.conf
         - jem service start
       user: root
-
-    - return:
-        result: success
-        message: ${baseUrl}/texts/clusterSuccess.md
+    
+    - installClusterTools:
 
