@@ -12,6 +12,11 @@ settings:
       caption: Cluster Password
       type: string
       value: 
+    - name: clusterToolsVersion
+      caption: clusterToolsVersion
+      type: string
+      value: 20211119
+      hidden: true
 
 
 onInstall:
@@ -23,8 +28,8 @@ onInstall:
     logo: /images/Redis_cluster.png?_r=${fn.random}
     description:
       short: |
-               Redis Cluster Tools.
-               version 18/11/2021
+               Redis Cluster Tools
+               version: ${settings.clusterToolsVersion}
 
     globals:
       pass: "${settings.redisClusterPassword}"
