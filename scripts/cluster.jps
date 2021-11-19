@@ -254,7 +254,7 @@ actions:
         jps: ${baseUrl}/scripts/clusterTools.jps
         envName: ${env.envName}      
         settings:
-          redisClusterPassword: ${globals.pass}
+          redisClusterPassword: ${settings.redisClusterPassword}
 
   showClusterPassword: 
     message: "Cluster password is ${settings.redisClusterPassword}"
