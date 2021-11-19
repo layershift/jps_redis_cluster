@@ -180,7 +180,7 @@ onInstall:
       envName: ${settings.envName}
       data: 
         isResetServicePassword: false
-        adminUrl: https://developer:${globals.pass}@node${globals.nodes.redis_nodes[0].id}-${globals.env.domain}/connect/
+        adminUrl: https://node${globals.nodes.redis_nodes[0].id}-${globals.env.domain}/connect/
 
 success: texts/success.md
 
