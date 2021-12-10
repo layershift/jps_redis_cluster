@@ -280,7 +280,3 @@ actions:
         - jem service start
       user: root    
     - installClusterTools:
-    - return:
-        result: success
-        message: ${baseUrl}/texts/clusterSuccess.md
-
