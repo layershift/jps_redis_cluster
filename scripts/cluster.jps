@@ -40,6 +40,7 @@ buttons:
       All data stored in the cluster will be lost!
     caption: Rebuild Cluster
     action: doInstall
+    settings: main
     loadingText: Installing...
 
 onInstall: doInstall
@@ -60,11 +61,10 @@ onBeforeRemoveNode[redis_nodes]:
     type: warning
     message: Redis Cluster does not support scaling!
 
-onBeforeAttachExtIp[redis_nodes]:
+onBeforeSetExtIpCount[redis_nodes]:
   stopEvent:
     type: warning
     message: Redis Cluster does not support public IP addresses!
-
 
 settings:
 #The port settings are hidden from the customer and are used for the correct configuration
@@ -120,7 +120,12 @@ settings:
 
 actions:
   doInstall:
-    - setExtIpEnabled [redis_nodes]: false
+    - if ("${settings.redisClusterPassword}" == ""):
+        setGlobals:
+          pass: ${fn.password}
+    - else:
+        setGlobals:
+          pass: ${settings.redisClusterPassword}
     - log:
         - ${settings}
   #Set ranadom password if global pass is empty
@@ -280,7 +285,6 @@ actions:
     - else:
         setGlobals:
           pass: ${settings.redisClusterPassword}
-
     - cmd[redis_nodes]:
         - jem service stop
         - sed "s#requirepass.*#requirepass ${globals.pass}#g" -i /etc/redis.conf
