@@ -39,7 +39,7 @@ buttons:
       Do you want to reinstall the cluster?
       All data stored in the cluster will be lost!
     caption: Rebuild Cluster
-    action: doInstall
+    action: doRebuildCluster
     settings: main
     loadingText: Installing...
 
@@ -290,7 +290,26 @@ actions:
         - sed "s#requirepass.*#requirepass ${globals.pass}#g" -i /etc/redis.conf
         - sed "s#masterauth.*#masterauth ${globals.pass}#g" -i /etc/redis/redis_cluster.conf
         - jem service start
-      user: root
-    
+      user: root    
     - installClusterTools:
+    - return:
+        result: success
+        message: ${baseUrl}/texts/clusterSuccess.md
+  
+  doRebuildCluster: 
+    - if ("${settings.redisClusterPassword}" == ""):
+        setGlobals:
+          pass: ${fn.password}
+    - else:
+        setGlobals:
+          pass: ${settings.redisClusterPassword}
+    - install: 
+        jps: ${baseUrl}/scripts/cluster.jps
+        envName: ${env.envName}      
+        settings:
+          redisClusterPassword: ${globals.pass}
+    - return:
+        result: success
+        message: ${baseUrl}/texts/clusterSuccess.md
+
 
