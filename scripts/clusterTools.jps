@@ -91,16 +91,17 @@ onInstall:
         confirmText: Run "cluster nodes" redis command and show the output?
         loadingText: Checking...
 
-      - caption: Show connection information
-        action: showConnectionInformation
-        confirmText: Do you wish to display the cluster connection information?
-        loadingText: Compiling...
-
       - caption: Ping cluster nodes
         action: pingClusterNodes
         confirmText: Do you wish to run "ping" redis command on all cluster nodes?
         loadingText: Checking...
 
+      - caption: Show connection information
+        action: showConnectionInformation
+        confirmText: Do you wish to display the cluster connection information?
+        loadingText: Compiling...
+        
+    - menu:
       - caption: P3X-Redis-UI status
         action: checkP3XRedisUI
         confirmText: Do you wish to check p3x-redis-ui services status?
@@ -120,6 +121,7 @@ onInstall:
         action: updateP3XRedisUI
         confirmText: This action will pull the latest version of p3x-redis-ui from the public repository. Continue?
         loadingText: Applying...
+
 
     onUninstall: uninstall_nginx_interface
 

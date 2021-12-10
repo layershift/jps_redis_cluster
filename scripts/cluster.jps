@@ -29,7 +29,6 @@ buttons:
     successText: The cluster password was successfully changed!
     loadingText: Applying...
     
-
   - confirmText: Do you want to (re)install Cluster Tools?
     caption: Install ClusterTools
     action: installClusterTools
@@ -61,6 +60,10 @@ onBeforeRemoveNode[redis_nodes]:
     type: warning
     message: Redis Cluster does not support scaling!
 
+onBeforeAttachExtIp[redis_nodes]:
+  stopEvent:
+    type: warning
+    message: Redis Cluster does not support public IP addresses!
 
 
 settings:
@@ -117,6 +120,9 @@ settings:
 
 actions:
   doInstall:
+    - setExtIpEnabled [redis_nodes]: false
+    - log:
+        - ${settings}
   #Set ranadom password if global pass is empty
     - if ("${globals.pass}" == ""):
         setGlobals:
@@ -250,11 +256,17 @@ actions:
               }
     
   installClusterTools:
+    - if ("${settings.redisClusterPassword}" == ""):
+        setGlobals:
+          pass: ${fn.password}
+    - else:
+        setGlobals:
+          pass: ${settings.redisClusterPassword}
     - install: 
         jps: ${baseUrl}/scripts/clusterTools.jps
         envName: ${env.envName}      
         settings:
-          redisClusterPassword: ${settings.redisClusterPassword}
+          redisClusterPassword: ${globals.pass}
 
   showClusterPassword: 
     message: "Cluster password is ${settings.redisClusterPassword}"
