@@ -35,13 +35,6 @@ buttons:
     successText: Cluster Tools was successfully installed. Please check the add-on for more actions.
     loadingText: Installing...
 
-  - confirmText: |
-      Do you want to reinstall the cluster?
-      All data stored in the cluster will be lost!
-    caption: Rebuild Cluster
-    action: doRebuildCluster
-    settings: main
-    loadingText: Installing...
 
 onInstall: doInstall
 
@@ -120,18 +113,13 @@ settings:
 
 actions:
   doInstall:
+  #Set ranadom password if global pass is empty
     - if ("${settings.redisClusterPassword}" == ""):
         setGlobals:
           pass: ${fn.password}
     - else:
         setGlobals:
           pass: ${settings.redisClusterPassword}
-    - log:
-        - ${settings}
-  #Set ranadom password if global pass is empty
-    - if ("${globals.pass}" == ""):
-        setGlobals:
-          pass: ${fn.password}
   # cleanup any previous cluster files
     - doUninstall:
   #Open firewall ports from 7000-7005 and 17000-17005
@@ -295,21 +283,4 @@ actions:
     - return:
         result: success
         message: ${baseUrl}/texts/clusterSuccess.md
-  
-  doRebuildCluster: 
-    - if ("${settings.redisClusterPassword}" == ""):
-        setGlobals:
-          pass: ${fn.password}
-    - else:
-        setGlobals:
-          pass: ${settings.redisClusterPassword}
-    - install: 
-        jps: ${baseUrl}/scripts/cluster.jps
-        envName: ${env.envName}      
-        settings:
-          redisClusterPassword: ${globals.pass}
-    - return:
-        result: success
-        message: ${baseUrl}/texts/clusterSuccess.md
-
 
